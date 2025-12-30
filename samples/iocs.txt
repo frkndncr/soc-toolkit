@@ -1,0 +1,29 @@
+# SOC Toolkit - Sample IOC List
+# One IOC per line, lines starting with # are comments
+
+# ═══════════════════════════════════════════════════════════════
+# SAMPLE IP ADDRESSES
+# ═══════════════════════════════════════════════════════════════
+
+# Tor Exit Node (usually suspicious)
+185.220.101.45
+
+# Shodan Honeypot
+45.33.32.156
+
+# ═══════════════════════════════════════════════════════════════
+# SAMPLE DOMAINS
+# ═══════════════════════════════════════════════════════════════
+
+# Safe test domain
+example.com
+
+# ═══════════════════════════════════════════════════════════════
+# SAMPLE HASHES
+# ═══════════════════════════════════════════════════════════════
+
+# EICAR Test File MD5 (harmless test virus signature)
+44d88612fea8a8f36de82e1278abb02f
+
+# EICAR SHA256
+275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f

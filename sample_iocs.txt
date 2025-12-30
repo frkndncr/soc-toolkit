@@ -1,0 +1,43 @@
+# SOC Toolkit - Örnek IOC Listesi
+# Her satıra bir IOC yazın
+# '#' ile başlayan satırlar yorum olarak değerlendirilir
+
+# ═══════════════════════════════════════════════════════════════
+# ÖRNEK IP ADRESLERİ
+# ═══════════════════════════════════════════════════════════════
+
+# Tor Exit Node (genellikle şüpheli)
+185.220.101.45
+
+# Shodan Honeypot
+45.33.32.156
+
+# Bilinen C2 Server (test için)
+# 192.168.1.1
+
+# ═══════════════════════════════════════════════════════════════
+# ÖRNEK DOMAİNLER
+# ═══════════════════════════════════════════════════════════════
+
+# Test domain
+example.com
+
+# Malware tracker test (güvenli)
+# abuse.ch
+
+# ═══════════════════════════════════════════════════════════════
+# ÖRNEK HASH'LER
+# ═══════════════════════════════════════════════════════════════
+
+# EICAR Test File MD5 (zararsız test virüsü)
+44d88612fea8a8f36de82e1278abb02f
+
+# EICAR SHA256
+275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
+
+# ═══════════════════════════════════════════════════════════════
+# ÖRNEK URL'LER
+# ═══════════════════════════════════════════════════════════════
+
+# Test URL
+# https://example.com/test
