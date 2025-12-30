@@ -11,145 +11,162 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### SOC Analyst Workbench - All-in-One IOC Analysis Tool
+### SOC Analyst Workbench - All-in-One Threat Intelligence Tool
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Providers](https://img.shields.io/badge/providers-22-orange.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-2.0.0-brightgreen.svg)](#)
+[![Providers](https://img.shields.io/badge/providers-28-orange.svg)](#-providers)
+[![Free](https://img.shields.io/badge/free%20sources-25-brightgreen.svg)](#-providers)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](#)
 
-**🔍 22 Threat Intel Sources | 🎯 MITRE ATT&CK | 📂 IOC Extraction | ⚡ Parallel Queries**
+**🔍 28 Threat Intel Sources | 🆓 25 FREE (No API Key!) | 🎯 MITRE ATT&CK | ⚡ Parallel Queries**
 
 </div>
 
 ---
 
-## ✨ Features
+## ⭐ Why SOC Toolkit?
 
-- 🔍 **22 Intel Sources** - Query threat intelligence providers in parallel
-- 🎯 **MITRE ATT&CK** - Map IOCs to ATT&CK techniques automatically
-- 📂 **IOC Extraction** - Extract IOCs from log files (firewall, syslog, IDS)
-- 🔄 **Interactive Mode** - Continuous analysis session
-- 📋 **WHOIS & DNS** - Domain/IP enrichment
-- ⚡ **Parallel Queries** - 10x faster with concurrent API calls
-- 💾 **Smart Caching** - Cache results to reduce API calls
-- 📊 **Multiple Exports** - JSON, Markdown, CSV formats
+Most threat intelligence tools require API keys for every source. **SOC Toolkit is different:**
+
+- ✅ **25 sources work without any API key**
+- ✅ **Instant setup** - just `pip install` and go
+- ✅ **Real blocklists** from abuse.ch, Spamhaus, EmergingThreats, and more
+- ✅ **One command** queries all sources in parallel
 
 ---
 
-## 🚀 Installation
+## 🚀 Quick Start
 
 ```bash
+# Install
 pip install soc-toolkit
 
-# Or from source
-git clone https://github.com/frkndncr/soc-toolkit.git
-cd soc-toolkit
-pip install -e .
+# Analyze an IP
+soc 185.220.101.45
 
-soc --version
+# That's it! No API keys needed.
 ```
 
-## 🗑️ Uninstall
+---
 
-```bash
-pip uninstall soc-toolkit
-rm -rf ~/.soc-toolkit  # Remove config/cache (optional)
+## 📊 Example Output
+
 ```
+╔════════════════════════════════════════════════════════════════╗
+║ 🔍 IOC: 185.220.101.45                                         ║
+║ 📋 Type: IP                                                    ║
+║ 🔴 CRITICAL - Known malicious indicator!                       ║
+║ 📊 Found in 8/23 sources | ⚠️  2 sources flagged as malicious   ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌─────────────────┬──────────┬──────────┬─────────────────────────┐
+│ Source          │ Status   │ Threat   │ Details                 │
+├─────────────────┼──────────┼──────────┼─────────────────────────┤
+│ DNSBL           │ ✅ Found │ 🔴 Crit  │ 3/6 blacklists          │
+│ IPsum           │ ✅ Found │ 🔴 Crit  │ 3+ blacklist hits       │
+│ TorExit         │ ✅ Found │ 🟡 Med   │ TOR EXIT NODE           │
+│ GreyNoise       │ ✅ Found │ 🔵 Low   │ suspicious, noise=True  │
+│ Shodan          │ ✅ Found │ 🔵 Low   │ ports: 80               │
+│ IP-API          │ ✅ Found │ 🟢 Clean │ Germany, Brandenburg    │
+└─────────────────┴──────────┴──────────┴─────────────────────────┘
+```
+
+---
+
+## 🔌 Providers (28 Total)
+
+### 🆓 FREE - No API Key Required (25)
+
+#### API-Based (7)
+| Provider | Types | Description |
+|----------|-------|-------------|
+| Shodan InternetDB | IP | Open ports, CVEs |
+| IP-API | IP | GeoIP, proxy detection |
+| GreyNoise | IP | Scanner detection |
+| StopForumSpam | IP, Email | Spam database |
+| URLScan.io | URL, Domain | URL analysis |
+| IPInfo | IP | Geolocation |
+| CIRCL Hashlookup | Hash | Known file database |
+
+#### DNS Blacklist (1)
+| Provider | Types | Description |
+|----------|-------|-------------|
+| DNSBL | IP | Checks 6 major blacklists (Spamhaus, SpamCop, SORBS, Barracuda, CBL, UCEProtect) |
+
+#### Blocklist Downloads (17)
+| Provider | Source | Description |
+|----------|--------|-------------|
+| EmergingThreats | Proofpoint | Compromised IPs |
+| CINS Army | Sentinel IPS | Bad reputation IPs |
+| Blocklist.de | Community | Attack source IPs |
+| Feodo Tracker | abuse.ch | Botnet C2 servers |
+| SSLBL | abuse.ch | Malicious SSL certs |
+| Tor Exit Nodes | torproject.org | Tor exit detection |
+| Spamhaus DROP | Spamhaus | Hijacked networks |
+| Binary Defense | BinaryDefense | Threat IPs |
+| GreenSnow | GreenSnow | Attack IPs |
+| IPsum | stamparm | 3+ blacklist aggregator |
+| DShield | SANS ISC | Top attackers |
+| BruteForce Blocker | danger.rulez.sk | SSH/FTP attackers |
+| URLhaus | abuse.ch | Malware URLs |
+| ThreatFox | abuse.ch | IOC database |
+| MalwareBazaar | abuse.ch | Malware hashes |
+| Phishing Database | Community | Phishing domains |
+| OpenPhish | OpenPhish | Phishing URLs |
+
+### 🔑 Premium - API Key Required (3)
+
+| Provider | Free Tier | Get Key |
+|----------|-----------|---------|
+| VirusTotal | 500/day | [virustotal.com](https://virustotal.com) |
+| AbuseIPDB | 1000/day | [abuseipdb.com](https://abuseipdb.com) |
+| AlienVault OTX | Unlimited | [otx.alienvault.com](https://otx.alienvault.com) |
 
 ---
 
 ## 💡 Usage
 
 ```bash
-# Basic lookup
-soc 185.220.101.45                      # IP
-soc evil-domain.com                      # Domain
-soc 44d88612fea8a8f36de82e1278abb02f    # Hash
+# IP Analysis
+soc 185.220.101.45
+
+# Domain Analysis
+soc evil-domain.com
+
+# Hash Analysis
+soc 44d88612fea8a8f36de82e1278abb02f
 
 # MITRE ATT&CK Mapping
-soc 185.220.101.45 --mitre              # Show ATT&CK techniques
+soc 185.220.101.45 --mitre
 
-# Enrichment
-soc evil.com --whois                    # WHOIS lookup
-soc evil.com --dns                      # DNS records
-soc evil.com --enrich                   # Full enrichment (WHOIS + DNS)
+# WHOIS & DNS Enrichment
+soc evil.com --enrich
 
-# IOC Extraction
-soc -e /var/log/firewall.log            # Extract IOCs from log
-soc -e access.log --analyze             # Extract + analyze
+# Extract IOCs from log file
+soc -e /var/log/firewall.log
 
-# Interactive Mode
+# Batch analysis
+soc -f iocs.txt -o ./reports/
+
+# Interactive mode
 soc -i
 
-# Batch & Export
-soc -f iocs.txt -o ./reports/
+# Export formats
 soc 1.2.3.4 --json out.json
 soc 1.2.3.4 --md report.md
 ```
 
 ---
 
-## 🔌 Providers (22 Total)
+## 🔑 Optional: Add API Keys
 
-### ✅ Free - No API Key Required (10)
-
-| Provider | Types | Description |
-|----------|-------|-------------|
-| Shodan InternetDB | IP | Open ports, vulnerabilities |
-| IP-API | IP | GeoIP, ISP, proxy detection |
-| GreyNoise | IP | Internet scanner detection |
-| Pulsedive | IP, Domain, URL | Community threat intel |
-| Maltiverse | IP, Domain, URL, Hash | IOC classification |
-| StopForumSpam | IP, Email | Spam database |
-| URLScan.io | URL, Domain | URL analysis |
-| IPInfo | IP | GeoIP information |
-| ThreatCrowd | IP, Domain, Email | Open threat intel |
-| CIRCL Hashlookup | Hash | Known file database |
-
-### 🔑 Premium - Free API Key Available (12)
-
-| Provider | Types | Free Tier | Get Key |
-|----------|-------|-----------|---------|
-| VirusTotal | All | 500/day | [virustotal.com](https://virustotal.com) |
-| AbuseIPDB | IP | 1000/day | [abuseipdb.com](https://abuseipdb.com) |
-| HybridAnalysis | Hash | 200/day | [hybrid-analysis.com](https://hybrid-analysis.com) |
-| Censys | IP, Domain | 250/day | [censys.io](https://censys.io) |
-| AlienVault OTX | All | Unlimited | [otx.alienvault.com](https://otx.alienvault.com) |
-| ThreatFox | IP, Domain, Hash | Unlimited | [auth.abuse.ch](https://auth.abuse.ch) |
-| URLHaus | URL, Domain, IP | Unlimited | [auth.abuse.ch](https://auth.abuse.ch) |
-| MalwareBazaar | Hash | Unlimited | [auth.abuse.ch](https://auth.abuse.ch) |
-| BinaryEdge | IP, Domain | 250/month | [binaryedge.io](https://binaryedge.io) |
-| CriminalIP | IP, Domain | 100/day | [criminalip.io](https://criminalip.io) |
-| IPQualityScore | IP, Email | 5000/month | [ipqualityscore.com](https://ipqualityscore.com) |
-
-> ⚠️ **Note:** abuse.ch services (ThreatFox, URLHaus, MalwareBazaar) require a free API key since May 2025. Get one key for all services at [auth.abuse.ch](https://auth.abuse.ch)
-
----
-
-## 🔑 API Keys Configuration
+For even more coverage, add these free API keys:
 
 ```bash
-# Set via environment variables
 export VIRUSTOTAL_API_KEY="your-key"
 export ABUSEIPDB_API_KEY="your-key"
 export OTX_API_KEY="your-key"
-export HYBRID_ANALYSIS_API_KEY="your-key"
-
-# abuse.ch services (single key for all)
-export THREATFOX_API_KEY="your-abuse-ch-key"
-export URLHAUS_API_KEY="your-abuse-ch-key"
-export MALWAREBAZAAR_API_KEY="your-abuse-ch-key"
-```
-
-Or create `~/.soc-toolkit/config.ini`:
-
-```ini
-[api_keys]
-virustotal = your-key
-abuseipdb = your-key
-otx = your-key
-threatfox = your-abuse-ch-key
 ```
 
 ---
@@ -160,7 +177,6 @@ threatfox = your-abuse-ch-key
 soc 185.220.101.45 --mitre
 ```
 
-Output:
 ```
 🎯 MITRE ATT&CK Mapping
 
@@ -176,58 +192,69 @@ Output:
 
 ---
 
-## 📊 Example Output
-
-```
-╔══════════════════════════════════════════════════════════════╗
-║ 🔍 IOC: 185.220.101.45                                       ║
-║ 📋 Type: IP                                                  ║
-║ 🔴 CRITICAL - Known malicious indicator!                     ║
-║ 📊 Found in 8/22 sources | ⚠️  3 sources flagged as malicious ║
-╚══════════════════════════════════════════════════════════════╝
-
-┌─────────────┬──────────┬──────────┬─────────────────────────┐
-│ Source      │ Status   │ Threat   │ Details                 │
-├─────────────┼──────────┼──────────┼─────────────────────────┤
-│ Maltiverse  │ ✅ Found │ 🔴 Crit  │ classification: malicio │
-│ GreyNoise   │ ✅ Found │ 🔵 Low   │ classification: suspici │
-│ Shodan      │ ✅ Found │ 🔵 Low   │ ports: 80, 443          │
-│ IP-API      │ ✅ Found │ 🟢 Clean │ country: Germany        │
-└─────────────┴──────────┴──────────┴─────────────────────────┘
-```
-
----
-
-## 🧪 Testing
+## 📦 Installation
 
 ```bash
-chmod +x test_soc.sh
-./test_soc.sh
+# From PyPI
+pip install soc-toolkit
+
+# From source
+git clone https://github.com/frkndncr/soc-toolkit.git
+cd soc-toolkit
+pip install -e .
+
+# Verify
+soc --version
+soc --providers
 ```
 
 ---
 
 ## 📝 Changelog
 
-### v2.0.0 (December 2025)
-- 🔄 Updated all providers to latest APIs
-- ➕ Added 3 new providers (CIRCL, CriminalIP, IPQualityScore)
-- ⚠️ abuse.ch services now require free API key
-- 🎯 MITRE ATT&CK mapping
-- 📋 WHOIS & DNS enrichment
-- 🐛 Fixed deprecated API endpoints
+### v2.1.0 (December 2025) 🆕
+- 🔥 **25 FREE providers** - no API key required!
+- ➕ Added 17 blocklist-based providers
+- ➕ EmergingThreats, CINS Army, Blocklist.de
+- ➕ Spamhaus DROP, Binary Defense, GreenSnow
+- ➕ IPsum, DShield, BruteForce Blocker
+- ➕ Phishing Database, OpenPhish
+- 🔄 Smart blocklist caching (1 hour)
+- ⚡ Parallel queries for faster results
 
-### v1.2.0
+### v2.0.0 (December 2025)
+- Updated all providers to latest APIs
 - Added MITRE ATT&CK mapping
-- Added WHOIS/DNS enrichment
-- 19 providers
+- Added WHOIS & DNS enrichment
+
+### v1.0.0
+- Initial release with 19 providers
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Feel free to submit issues and pull requests.
 
 ---
 
 ## 👨‍💻 Author
 
-**Furkan Dinçer** - [@frkndncr](https://github.com/frkndncr)
+**Furkan Dinçer** - Security Engineer
+
+[![GitHub](https://img.shields.io/badge/GitHub-frkndncr-black?logo=github)](https://github.com/frkndncr)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://linkedin.com/in/frkndncr)
+
+---
 
 ## 📄 License
 
-MIT License
+MIT License - feel free to use in your projects!
+
+---
+
+<div align="center">
+
+**⭐ Star this repo if you find it useful!**
+
+</div>
