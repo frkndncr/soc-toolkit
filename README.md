@@ -243,7 +243,7 @@ Contributions welcome! Feel free to submit issues and pull requests.
 **Furkan Dinçer** - Security Engineer
 
 [![GitHub](https://img.shields.io/badge/GitHub-frkndncr-black?logo=github)](https://github.com/frkndncr)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://linkedin.com/in/frkndncr)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://linkedin.com/in/furkan-dincer)
 
 ---
 
