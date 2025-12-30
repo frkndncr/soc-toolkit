@@ -9,23 +9,36 @@ from pathlib import Path
 class Config:
     """Configuration settings"""
     
-    VERSION = "1.2.0"
+    VERSION = "2.0.0"
     TIMEOUT = 15
-    USER_AGENT = "SOC-Toolkit/1.2 (https://github.com/frkndncr/soc-toolkit)"
+    USER_AGENT = "SOC-Toolkit/2.0 (https://github.com/frkndncr/soc-toolkit)"
     MAX_WORKERS = 10
     
-    # API Keys
+    # API Keys - Free providers (no key needed for basic use)
+    GREYNOISE_API_KEY: str = ""
+    PULSEDIVE_API_KEY: str = ""
+    MALTIVERSE_API_KEY: str = ""
+    URLSCAN_API_KEY: str = ""
+    IPINFO_API_KEY: str = ""
+    
+    # API Keys - Premium (free tier available)
     VIRUSTOTAL_API_KEY: str = ""
     ABUSEIPDB_API_KEY: str = ""
-    SHODAN_API_KEY: str = ""
-    OTX_API_KEY: str = ""
-    GREYNOISE_API_KEY: str = ""
-    URLSCAN_API_KEY: str = ""
     HYBRID_ANALYSIS_API_KEY: str = ""
     CENSYS_API_ID: str = ""
     CENSYS_API_SECRET: str = ""
-    PULSEDIVE_API_KEY: str = ""
-    MALTIVERSE_API_KEY: str = ""
+    OTX_API_KEY: str = ""
+    
+    # API Keys - abuse.ch (free key required since May 2025)
+    THREATFOX_API_KEY: str = ""
+    URLHAUS_API_KEY: str = ""
+    MALWAREBAZAAR_API_KEY: str = ""
+    
+    # API Keys - Additional premium
+    BINARYEDGE_API_KEY: str = ""
+    CRIMINALIP_API_KEY: str = ""
+    IPQUALITYSCORE_API_KEY: str = ""
+    SHODAN_API_KEY: str = ""
     PHISHTANK_API_KEY: str = ""
     
     # Cache settings
@@ -40,17 +53,31 @@ class Config:
     @classmethod
     def load_from_env(cls):
         """Load API keys from environment variables"""
+        # Free tier enhanced
+        cls.GREYNOISE_API_KEY = os.environ.get("GREYNOISE_API_KEY", "")
+        cls.PULSEDIVE_API_KEY = os.environ.get("PULSEDIVE_API_KEY", "")
+        cls.MALTIVERSE_API_KEY = os.environ.get("MALTIVERSE_API_KEY", "")
+        cls.URLSCAN_API_KEY = os.environ.get("URLSCAN_API_KEY", "")
+        cls.IPINFO_API_KEY = os.environ.get("IPINFO_API_KEY", "")
+        
+        # Premium providers
         cls.VIRUSTOTAL_API_KEY = os.environ.get("VIRUSTOTAL_API_KEY", "")
         cls.ABUSEIPDB_API_KEY = os.environ.get("ABUSEIPDB_API_KEY", "")
-        cls.SHODAN_API_KEY = os.environ.get("SHODAN_API_KEY", "")
-        cls.OTX_API_KEY = os.environ.get("OTX_API_KEY", "")
-        cls.GREYNOISE_API_KEY = os.environ.get("GREYNOISE_API_KEY", "")
-        cls.URLSCAN_API_KEY = os.environ.get("URLSCAN_API_KEY", "")
         cls.HYBRID_ANALYSIS_API_KEY = os.environ.get("HYBRID_ANALYSIS_API_KEY", "")
         cls.CENSYS_API_ID = os.environ.get("CENSYS_API_ID", "")
         cls.CENSYS_API_SECRET = os.environ.get("CENSYS_API_SECRET", "")
-        cls.PULSEDIVE_API_KEY = os.environ.get("PULSEDIVE_API_KEY", "")
-        cls.MALTIVERSE_API_KEY = os.environ.get("MALTIVERSE_API_KEY", "")
+        cls.OTX_API_KEY = os.environ.get("OTX_API_KEY", "")
+        
+        # abuse.ch services (free key from auth.abuse.ch)
+        cls.THREATFOX_API_KEY = os.environ.get("THREATFOX_API_KEY", "")
+        cls.URLHAUS_API_KEY = os.environ.get("URLHAUS_API_KEY", "")
+        cls.MALWAREBAZAAR_API_KEY = os.environ.get("MALWAREBAZAAR_API_KEY", "")
+        
+        # Additional
+        cls.BINARYEDGE_API_KEY = os.environ.get("BINARYEDGE_API_KEY", "")
+        cls.CRIMINALIP_API_KEY = os.environ.get("CRIMINALIP_API_KEY", "")
+        cls.IPQUALITYSCORE_API_KEY = os.environ.get("IPQUALITYSCORE_API_KEY", "")
+        cls.SHODAN_API_KEY = os.environ.get("SHODAN_API_KEY", "")
         cls.PHISHTANK_API_KEY = os.environ.get("PHISHTANK_API_KEY", "")
         
     @classmethod

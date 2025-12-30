@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soc-toolkit"
-version = "1.2.0"
-description = "🛡️ SOC Analyst Workbench - All-in-One IOC Lookup & Extraction Tool with 20 Intel Sources"
+version = "2.0.0"
+description = "🛡️ SOC Analyst Workbench - 22 Threat Intel Sources | MITRE ATT&CK | IOC Analysis"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"

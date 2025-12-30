@@ -3,7 +3,7 @@ SOC Toolkit - All-in-One IOC Lookup & Extraction Tool for Security Analysts
 20 Threat Intelligence Sources | IOC Extraction | Interactive Mode | MITRE ATT&CK
 """
 
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 __author__ = "Furkan Dinçer"
 __email__ = "frkndncr@github.com"
 __url__ = "https://github.com/frkndncr/soc-toolkit"
