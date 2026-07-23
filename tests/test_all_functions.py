@@ -253,6 +253,13 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         test_v7_mitre_matrix()
         test_v7_api_vault()
 
+    def test_23_enterprise_features(self):
+        from test_enterprise import test_rbac_token_and_permissions, test_edr_telemetry, test_incident_timeline, test_ha_cluster
+        test_rbac_token_and_permissions()
+        test_edr_telemetry()
+        test_incident_timeline()
+        test_ha_cluster()
+
 
 if __name__ == "__main__":
     unittest.main()

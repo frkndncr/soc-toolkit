@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SOC Toolkit CLI v7.0.0 Enterprise Security & Incident Response Platform
+SOC Toolkit CLI Enterprise SOC Operations Suite
 """
 
 import argparse
@@ -52,6 +52,10 @@ from .mem_forensics import MemoryForensicsEngine
 from .report_gen import ExecutiveReportGenerator
 from .mitre_matrix import MITREMatrixEngine
 from .vault import APIVault
+from .enterprise_auth import EnterpriseRBACEngine, SOCRole
+from .edr_collector import EDRCollectorEngine
+from .timeline import IncidentTimelineEngine
+from .cluster import HAClusterEngine
 
 
 console = Console(legacy_windows=False)
@@ -59,7 +63,8 @@ console = Console(legacy_windows=False)
 SUBCOMMANDS = {
     "shell", "ai", "soar", "server", "audit", "pcap",
     "analyze", "c2-decode", "triage", "decode", "defang", "refang", "web",
-    "report", "mem", "mitre-matrix", "vault", "stream"
+    "report", "mem", "mitre-matrix", "vault", "stream",
+    "edr", "timeline", "cluster", "rbac"
 }
 
 
@@ -68,16 +73,15 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         prog="soc",
-        description="🛡️ SOC Toolkit v7.0.0 - Enterprise SOC Operations Suite",
+        description="🛡️ SOC Toolkit - Enterprise Multi-Tenant SOC Suite",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  soc 185.220.101.45                    # IP lookup with AI Root Cause Analysis
-  soc report 185.220.101.45             # 1-Click Jira/ServiceNow Incident Ticket
-  soc mem lsass_dump.txt                # Process Memory & Mimikatz Threat Hunter
-  soc mitre-matrix 185.220.101.45       # 14-Tactic MITRE ATT&CK Heatmap
-  soc vault set virustotal API_KEY      # Store API key in encrypted vault
-  soc shell                             # Launch Interactive Threat Analyst Terminal Shell
+  soc 185.220.101.45                    # IP lookup
+  soc edr HOST-WORKSTATION-01           # Fetch EDR telemetry & process tree
+  soc timeline 185.220.101.45           # Incident event timeline
+  soc cluster                           # HA Multi-Node Cluster Status
+  soc rbac analyst_john                 # Generate JWT token with RBAC role
 
 Author: Furkan Dinçer (@frkndncr)
 GitHub: https://github.com/frkndncr/soc-toolkit
@@ -86,7 +90,7 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     
     parser.add_argument("ioc", nargs="?", help="IOC to lookup (IP, domain, hash, URL) or subcommand")
     parser.add_argument("subarg", nargs="?", help="Secondary argument for subcommands")
-    parser.add_argument("extra_arg", nargs="?", help="Tertiary argument for vault/subcommands")
+    parser.add_argument("extra_arg", nargs="?", help="Tertiary argument for subcommands")
 
     output_group = parser.add_argument_group("Output & Export Options")
     output_group.add_argument("--json", metavar="FILE", help="Export report to JSON file")
@@ -121,6 +125,29 @@ def main():
     args = parser.parse_args()
 
     cmd = args.ioc
+
+    if cmd == "edr":
+        target = args.subarg or "HOST-SEC-01"
+        res = EDRCollectorEngine.get_host_telemetry(target)
+        console.print(Panel(json.dumps(res, indent=2), title="🔌 Enterprise EDR Process Tree & Telemetry", border_style="cyan"))
+        return
+
+    if cmd == "timeline":
+        target = args.subarg or "185.220.101.45"
+        res = IncidentTimelineEngine.generate_timeline(target)
+        console.print(Panel(json.dumps(res, indent=2), title="⏳ Chronological Incident Event Timeline", border_style="magenta"))
+        return
+
+    if cmd == "cluster":
+        res = HAClusterEngine.get_cluster_status()
+        console.print(Panel(json.dumps(res, indent=2), title="🌐 High-Availability SOC Cluster Status", border_style="green"))
+        return
+
+    if cmd == "rbac":
+        user = args.subarg or "analyst_john"
+        token = EnterpriseRBACEngine.generate_token(user, SOCRole.TIER_2)
+        console.print(Panel(f"User: [cyan]{user}[/]\nRole: [bold]{SOCRole.TIER_2}[/]\nJWT Token:\n[dim]{token}[/]", title="🔐 Enterprise RBAC Token Generated", border_style="yellow"))
+        return
 
     if cmd == "shell":
         start_interactive_shell()

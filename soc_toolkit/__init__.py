@@ -1,5 +1,5 @@
 """
-SOC Toolkit Enterprise SOC Operations Suite
+SOC Toolkit Enterprise Multi-Tenant Security Suite
 """
 
 __version__ = "6.0.0"
@@ -44,6 +44,10 @@ from .mem_forensics import MemoryForensicsEngine
 from .report_gen import ExecutiveReportGenerator
 from .mitre_matrix import MITREMatrixEngine
 from .vault import APIVault
+from .enterprise_auth import EnterpriseRBACEngine, SOCRole
+from .edr_collector import EDRCollectorEngine
+from .timeline import IncidentTimelineEngine
+from .cluster import HAClusterEngine
 
 __all__ = [
     "SOCToolkit",
@@ -93,5 +97,10 @@ __all__ = [
     "ExecutiveReportGenerator",
     "MITREMatrixEngine",
     "APIVault",
+    "EnterpriseRBACEngine",
+    "SOCRole",
+    "EDRCollectorEngine",
+    "IncidentTimelineEngine",
+    "HAClusterEngine",
     "__version__"
 ]
