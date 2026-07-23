@@ -12,7 +12,7 @@ if tests_dir not in sys.path:
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-from soc_toolkit.enums import IOCType, ThreatLevel
+from soc_toolkit.enums import IOCType, ThreatLevel, LookupResult, IOCReport
 from soc_toolkit.whitelist import WhitelistFilter
 from soc_toolkit.playbook import PlaybookGenerator, Playbook
 from soc_toolkit.decoder import PayloadDecoder
@@ -198,8 +198,16 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         self.assertEqual(defanged, "1[.]1[.]1[.]1")
 
     def test_20_formatter_exports(self):
-        soc = SOCToolkit()
-        report = soc.lookup("8.8.8.8")
+        report = IOCReport(
+            ioc="8.8.8.8",
+            ioc_type=IOCType.IP,
+            timestamp="2026-07-23T12:00:00",
+            results=[
+                LookupResult(source="Shodan", found=True, threat_level=ThreatLevel.CLEAN, response_time=0.1)
+            ],
+            overall_threat_level=ThreatLevel.CLEAN,
+            summary="Clean IP"
+        )
         formatter = OutputFormatter()
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -227,7 +235,11 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
             tmp_path = tmp.name
 
         try:
-            triage_engine = LogTriageEngine()
+            class DummySOC:
+                def lookup(self, ioc):
+                    return IOCReport(ioc=ioc, ioc_type=IOCType.IP, timestamp="2026-07-23", overall_threat_level=ThreatLevel.HIGH, summary="High Threat")
+            
+            triage_engine = LogTriageEngine(soc_engine=DummySOC())
             result = triage_engine.triage_file(tmp_path)
             self.assertGreaterEqual(result["total_iocs_extracted"], 1)
         finally:
