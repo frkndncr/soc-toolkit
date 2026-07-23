@@ -1,54 +1,16 @@
 import sys
 from pathlib import Path
-root = str(Path(__file__).parent.parent)
-if root not in sys.path:
-    sys.path.insert(0, root)
+
+tests_dir = str(Path(__file__).parent)
+root_dir = str(Path(__file__).parent.parent)
+
+if tests_dir not in sys.path:
+    sys.path.insert(0, tests_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 import unittest
-from test_whitelist import test_google_dns_whitelist, test_cloudflare_dns_whitelist, test_malicious_ip_not_whitelisted, test_trusted_domain_whitelist
-from test_playbook import test_critical_ip_playbook, test_clean_domain_playbook
-from test_decoder import test_defang_url, test_refang_url, test_decode_powershell
-from test_sdk import test_sdk_defang_refang, test_sdk_decode
-from test_v4 import test_pe_entropy, test_c2_extraction, test_siem_queries, test_mitre_navigator
-from test_v5 import test_compliance_evaluation, test_taxii_discovery, test_siem_splunk_script
-from test_v6 import test_ai_analyst, test_active_defense_ban, test_soar_workflow, test_siem_correlator
-
-class TestSOCToolkit(unittest.TestCase):
-    def test_whitelist(self):
-        test_google_dns_whitelist()
-        test_cloudflare_dns_whitelist()
-        test_malicious_ip_not_whitelisted()
-        test_trusted_domain_whitelist()
-
-    def test_playbook(self):
-        test_critical_ip_playbook()
-        test_clean_domain_playbook()
-
-    def test_decoder(self):
-        test_defang_url()
-        test_refang_url()
-        test_decode_powershell()
-
-    def test_sdk(self):
-        test_sdk_defang_refang()
-        test_sdk_decode()
-
-    def test_v4_features(self):
-        test_pe_entropy()
-        test_c2_extraction()
-        test_siem_queries()
-        test_mitre_navigator()
-
-    def test_v5_features(self):
-        test_compliance_evaluation()
-        test_taxii_discovery()
-        test_siem_splunk_script()
-
-    def test_v6_features(self):
-        test_ai_analyst()
-        test_active_defense_ban()
-        test_soar_workflow()
-        test_siem_correlator()
+from test_all_functions import ComprehensiveAllFunctionsTest
 
 if __name__ == "__main__":
     unittest.main()

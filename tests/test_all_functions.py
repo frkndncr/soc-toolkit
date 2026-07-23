@@ -4,9 +4,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-root = str(Path(__file__).parent.parent)
-if root not in sys.path:
-    sys.path.insert(0, root)
+tests_dir = str(Path(__file__).parent)
+root_dir = str(Path(__file__).parent.parent)
+
+if tests_dir not in sys.path:
+    sys.path.insert(0, tests_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 from soc_toolkit.enums import IOCType, ThreatLevel
 from soc_toolkit.whitelist import WhitelistFilter
