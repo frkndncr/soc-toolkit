@@ -1,5 +1,5 @@
 """
-SOC Toolkit v6.0.0 Military & Enterprise Cyber Security Suite
+SOC Toolkit Enterprise SOC Operations Suite
 """
 
 __version__ = "6.0.0"
@@ -39,6 +39,11 @@ from .soar import SOAREngine
 from .yara_engine import YARAEngine
 from .dashboard import DashboardEngine
 from .shell import start_interactive_shell
+from .stream import SyslogStreamListener
+from .mem_forensics import MemoryForensicsEngine
+from .report_gen import ExecutiveReportGenerator
+from .mitre_matrix import MITREMatrixEngine
+from .vault import APIVault
 
 __all__ = [
     "SOCToolkit",
@@ -83,5 +88,10 @@ __all__ = [
     "YARAEngine",
     "DashboardEngine",
     "start_interactive_shell",
+    "SyslogStreamListener",
+    "MemoryForensicsEngine",
+    "ExecutiveReportGenerator",
+    "MITREMatrixEngine",
+    "APIVault",
     "__version__"
 ]

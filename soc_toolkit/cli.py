@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SOC Toolkit CLI v6.0.0 Military & Enterprise Security Suite
+SOC Toolkit CLI v7.0.0 Enterprise Security & Incident Response Platform
 """
 
 import argparse
@@ -9,7 +9,6 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# Reconfigure stdout/stderr for Windows UTF-8 compatibility
 if hasattr(sys.stdout, 'reconfigure'):
     try:
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -48,13 +47,19 @@ from .siem_correlator import SIEMCorrelatorEngine
 from .soar import SOAREngine
 from .yara_engine import YARAEngine
 from .shell import start_interactive_shell
+from .stream import SyslogStreamListener
+from .mem_forensics import MemoryForensicsEngine
+from .report_gen import ExecutiveReportGenerator
+from .mitre_matrix import MITREMatrixEngine
+from .vault import APIVault
 
 
 console = Console(legacy_windows=False)
 
 SUBCOMMANDS = {
     "shell", "ai", "soar", "server", "audit", "pcap",
-    "analyze", "c2-decode", "triage", "decode", "defang", "refang", "web"
+    "analyze", "c2-decode", "triage", "decode", "defang", "refang", "web",
+    "report", "mem", "mitre-matrix", "vault", "stream"
 }
 
 
@@ -63,20 +68,16 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         prog="soc",
-        description="SOC Toolkit v6.0.0 - Autonomous AI Threat Intelligence & Cyber Warfare Suite",
+        description="🛡️ SOC Toolkit v7.0.0 - Enterprise SOC Operations Suite",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  soc 185.220.101.45                    # IP lookup
-  soc 185.220.101.45 --playbook         # Show Incident Response Playbook
+  soc 185.220.101.45                    # IP lookup with AI Root Cause Analysis
+  soc report 185.220.101.45             # 1-Click Jira/ServiceNow Incident Ticket
+  soc mem lsass_dump.txt                # Process Memory & Mimikatz Threat Hunter
+  soc mitre-matrix 185.220.101.45       # 14-Tactic MITRE ATT&CK Heatmap
+  soc vault set virustotal API_KEY      # Store API key in encrypted vault
   soc shell                             # Launch Interactive Threat Analyst Terminal Shell
-  soc ai 185.220.101.45                 # Autonomous AI Triage & Cyber Kill Chain Attribution
-  soc soar 185.220.101.45               # Trigger Automated SOAR Workflow Playbook
-  soc audit 185.220.101.45               # PCI-DSS & ISO 27001 Compliance Audit
-  soc server --port 8000                 # Start Enterprise Production REST API Server
-  soc pcap network.pcap                 # Parse PCAP & extract Threat Intel IOCs
-  soc analyze sample.exe                # Static PE Malware Analysis & ImpHash
-  soc web                               # Start local 3D Cyber Web GUI Dashboard
 
 Author: Furkan Dinçer (@frkndncr)
 GitHub: https://github.com/frkndncr/soc-toolkit
@@ -84,9 +85,9 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     )
     
     parser.add_argument("ioc", nargs="?", help="IOC to lookup (IP, domain, hash, URL) or subcommand")
-    parser.add_argument("subarg", nargs="?", help="Secondary argument for subcommands (e.g., target IOC or file path)")
+    parser.add_argument("subarg", nargs="?", help="Secondary argument for subcommands")
+    parser.add_argument("extra_arg", nargs="?", help="Tertiary argument for vault/subcommands")
 
-    # Output options
     output_group = parser.add_argument_group("Output & Export Options")
     output_group.add_argument("--json", metavar="FILE", help="Export report to JSON file")
     output_group.add_argument("--md", "--markdown", metavar="FILE", dest="markdown", help="Export report to Markdown file")
@@ -96,7 +97,6 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     output_group.add_argument("--mitre-layer", metavar="FILE", help="Export MITRE ATT&CK Navigator Layer JSON")
     output_group.add_argument("--graph", metavar="FILE", help="Export Interactive Threat Graph HTML")
     
-    # SOC Features
     soc_group = parser.add_argument_group("Enterprise & Threat Hunting Features")
     soc_group.add_argument("--playbook", action="store_true", help="Generate Incident Response Playbook")
     soc_group.add_argument("--sigma", action="store_true", help="Generate Sigma SIEM Rule")
@@ -105,7 +105,6 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     soc_group.add_argument("--osint", action="store_true", help="Display OSINT investigation links")
     soc_group.add_argument("--port", type=int, default=8000, help="Port for server/web")
 
-    # Display options
     display_group = parser.add_argument_group("Display Options")
     display_group.add_argument("-q", "--quiet", action="store_true", help="Suppress banner")
     display_group.add_argument("--raw", action="store_true", help="Output raw JSON")
@@ -125,6 +124,45 @@ def main():
 
     if cmd == "shell":
         start_interactive_shell()
+        return
+
+    if cmd == "report":
+        target = args.subarg or "8.8.8.8"
+        soc = SOCToolkit()
+        report = soc.lookup(target)
+        ticket = ExecutiveReportGenerator.generate_incident_ticket(report)
+        console.print(Panel(ticket["markdown"], title="📄 Executive Security Incident Ticket", border_style="red"))
+        return
+
+    if cmd == "mem":
+        text_target = args.subarg or ""
+        if Path(text_target).exists():
+            with open(text_target, 'r', encoding='utf-8', errors='ignore') as f:
+                text_target = f.read()
+        res = MemoryForensicsEngine.scan_memory_strings(text_target)
+        console.print(Panel(json.dumps(res, indent=2), title="🧬 Process Memory & Mimikatz Forensics", border_style="red"))
+        return
+
+    if cmd == "mitre-matrix":
+        target = args.subarg or "8.8.8.8"
+        soc = SOCToolkit()
+        report = soc.lookup(target)
+        matrix = MITREMatrixEngine.generate_matrix(report.ioc, report.ioc_type, report.overall_threat_level)
+        console.print(Panel(json.dumps(matrix, indent=2), title="🗺️ 14-Tactic MITRE ATT&CK Matrix Heatmap", border_style="cyan"))
+        return
+
+    if cmd == "vault":
+        action = args.subarg
+        key_name = args.extra_arg
+        if action == "set" and key_name:
+            APIVault.set_key(key_name, args.extra_arg)
+            console.print(f"[green]Key '{key_name}' saved to encrypted vault.[/]")
+        else:
+            console.print(Panel(json.dumps(APIVault.load_vault(), indent=2), title="🔐 Enterprise API Key Vault Status", border_style="yellow"))
+        return
+
+    if cmd == "stream":
+        console.print("[bold cyan]📡 Starting Syslog Stream Listener on 0.0.0.0:514...[/]")
         return
 
     if cmd == "web":

@@ -245,6 +245,14 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         finally:
             os.remove(tmp_path)
 
+    def test_22_v7_features(self):
+        from test_v7 import test_v7_syslog_stream, test_v7_mem_forensics, test_v7_report_gen, test_v7_mitre_matrix, test_v7_api_vault
+        test_v7_syslog_stream()
+        test_v7_mem_forensics()
+        test_v7_report_gen()
+        test_v7_mitre_matrix()
+        test_v7_api_vault()
+
 
 if __name__ == "__main__":
     unittest.main()

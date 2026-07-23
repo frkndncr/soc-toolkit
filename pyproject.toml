@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "soc-toolkit"
 version = "6.0.0"
-description = "🛡️ SOC Toolkit v6.0 Autonomous AI Cyber Security Suite - AI Triage | Active Defense | SIEM Correlator | SOAR Engine"
+description = "🛡️ SOC Toolkit Enterprise SOC Suite - Live Syslog Stream | Memory Forensics | Executive Report Gen | MITRE Heatmap"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
