@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soc-toolkit-deployment
+  namespace: soc-security
+  labels:
+    app: soc-toolkit
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: soc-toolkit
+  template:
+    metadata:
+      labels:
+        app: soc-toolkit
+    spec:
+      containers:
+      - name: soc-toolkit
+        image: soc-toolkit:5.0.0
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: soc-toolkit-service
+  namespace: soc-security
+spec:
+  type: LoadBalancer
+  selector:
+    app: soc-toolkit
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000

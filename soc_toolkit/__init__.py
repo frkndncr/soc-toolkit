@@ -1,8 +1,8 @@
 """
-Enterprise SOC Toolkit v4.0.0 NextGen - Threat Hunting, Forensics & Malware Analysis Platform
+Enterprise SOC Toolkit v5.0.0 Ultimate - Mandatory Enterprise Security Platform
 """
 
-__version__ = "4.0.0"
+__version__ = "5.0.0"
 __author__ = "Furkan Dinçer"
 __email__ = "frkndncr@github.com"
 __url__ = "https://github.com/frkndncr/soc-toolkit"
@@ -28,6 +28,10 @@ from .c2_extractor import C2ConfigExtractor
 from .mitre_navigator import MITRENavigatorExporter
 from .siem_queries import SIEMQueryGenerator
 from .graph_visualizer import ThreatGraphVisualizer
+from .compliance import ComplianceEngine
+from .api_server import start_api_server
+from .taxii_server import TAXIIServerEngine
+from .siem_integrations import SIEMIntegrations
 
 __all__ = [
     "SOCToolkit",
@@ -61,5 +65,9 @@ __all__ = [
     "MITRENavigatorExporter",
     "SIEMQueryGenerator",
     "ThreatGraphVisualizer",
+    "ComplianceEngine",
+    "start_api_server",
+    "TAXIIServerEngine",
+    "SIEMIntegrations",
     "__version__"
 ]

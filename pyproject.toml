@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soc-toolkit"
-version = "4.0.0"
-description = "🛡️ Enterprise SOC Analyst Workbench v4.0 - PCAP Forensics | PE Static Analysis | C2 Decoder | SIEM Query Gen | 35+ Sources"
+version = "5.0.0"
+description = "🛡️ Enterprise SOC Analyst Workbench v5.0 Mandatory - Compliance Audit | REST API Server | STIX/TAXII | 35+ Sources"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"

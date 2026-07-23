@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  soc-toolkit-api:
+    build: .
+    container_name: soc-toolkit-api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-}
+      - ABUSEIPDB_API_KEY=${ABUSEIPDB_API_KEY:-}
+      - OTX_API_KEY=${OTX_API_KEY:-}
+
+  soc-toolkit-web:
+    build: .
+    container_name: soc-toolkit-web
+    restart: always
+    command: ["python", "-m", "soc_toolkit.cli", "web", "--port", "8080"]
+    ports:
+      - "8080:8080"

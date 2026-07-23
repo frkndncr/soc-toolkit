@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ Enterprise SOC Toolkit v4.0.0 NextGen
+# 🛡️ SOC Toolkit v5.0.0 Ultimate Enterprise Mandate
 
 ```
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -11,31 +11,32 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### World-Class Cyber Threat Hunting, Malware Analysis & Network Forensics Platform
+### The Mandatory Security Operations & Regulatory Compliance Platform for Enterprise SOC Teams
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Providers](https://img.shields.io/badge/providers-35+-orange.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-4.0.0--nextgen-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-5.0.0--enterprise-blue.svg)](#)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
+[![Kubernetes](https://img.shields.io/badge/k8s-ready-326ce5.svg)](k8s/deployment.yaml)
 [![CI Status](https://github.com/frkndncr/soc-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/frkndncr/soc-toolkit/actions)
 
-**🔍 35+ TI Sources | 📦 PCAP Forensics | 🔬 PE Malware Analysis | 🎯 C2 Beacon Decoder | 🔍 Multi-SIEM Query Gen | 🗺️ MITRE Navigator**
+**📜 Regulatory Compliance Audit | ⚡ Enterprise REST API | 📡 STIX/TAXII 2.1 | 🔌 Splunk/SIEM Apps | 📦 PCAP & PE Analysis**
 
 </div>
 
 ---
 
-## ⭐ Why SOC Toolkit v4.0.0 NextGen?
+## ⭐ Why Enterprise SOC Toolkit v5.0.0 is Mandatory for Every SOC Team
 
-**SOC Toolkit v4.0.0** elevates threat intelligence into a full-spectrum Cyber Threat Hunting and Malware Analysis platform:
+**SOC Toolkit v5.0.0** is the mandatory security operations platform designed for enterprise Security Operations Centers (SOC), CISOs, Compliance Officers, and Incident Responders:
 
-- 📦 **PCAP Network Packet Forensics (`soc pcap capture.pcap`)**: Parses network captures in pure Python, extracts DNS, HTTP, User-Agents, and cross-references extracted IOCs against 35+ Threat Intel providers.
-- 🔬 **Malware Static & PE Analyzer (`soc analyze sample.exe`)**: Calculates SHA256, MD5, SHA1, ImpHash (Import Hash), section entropy, suspicious API calls (`VirtualAlloc`, `WriteProcessMemory`), and detects packed binaries.
-- 🎯 **C2 Beacon Config Extractor (`soc c2-decode`)**: Decodes Cobalt Strike Malleable C2 configs (Watermark, Public Key, C2 endpoints) and AsyncRAT/Meterpreter configs.
-- 🔍 **Multi-SIEM Search Query Generator (`--siem-queries`)**: Generates instant copy-paste queries for **Splunk SPL**, **Elastic KQL**, **Microsoft Sentinel**, **IBM QRadar AQL**, and **CrowdStrike Falcon**.
-- 🗺️ **MITRE ATT&CK Navigator Layer Exporter (`--mitre-layer`)**: Exports JSON layer heatmaps for [MITRE ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/).
-- 🕸️ **Interactive Threat Graph Visualizer (`--graph`)**: Generates interactive SVG & HTML relationship graphs mapping IOCs to threat sources.
-- 🛡️ **Incident Response Playbooks & False Positive Suppression**: Generates `iptables` containment rules while automatically whitelisting Google DNS, Cloudflare, Akamai, and AWS infrastructure.
+- 📜 **Regulatory Compliance & Audit Engine (`soc audit`)**: Automatically maps security findings, malicious IOCs, and asset threats to **PCI-DSS 4.0**, **ISO/IEC 27001:2022**, **SOC 2 Type II**, and **NIST CSF 2.0** regulatory controls.
+- ⚡ **Production REST API Backend (`soc server`)**: High-performance RESTful JSON backend supporting API key authentication, rate limiting, and CORS headers for central enterprise querying.
+- 📡 **STIX / TAXII 2.1 Server Endpoint (`soc taxii-server`)**: TAXII 2.1 compliant feed server allowing enterprise firewalls (Palo Alto, Fortinet, Check Point) and EDRs (CrowdStrike, Defender) to pull threat feeds.
+- 🔌 **Out-of-the-Box SIEM & SOAR Integration Plugins**: Custom Splunk search commands (`| soclookup`), Elastic ingest pipelines, and Shuffle / Cortex XSOAR playbook schemas.
+- 🐳 **Docker & Kubernetes Enterprise Ready**: Multi-stage `Dockerfile`, `docker-compose.yml`, and `k8s/deployment.yaml` with Ingress and autoscaling.
+- 📦 **PCAP Packet Forensics & Static PE Malware Analysis**: Native network packet capture inspection and executable ImpHash / section entropy scoring.
 
 ---
 
@@ -45,46 +46,64 @@
 # Install package
 pip install soc-toolkit
 
-# Analyze an IP address with SIEM queries & Playbook
-soc 185.220.101.45 --siem-queries --playbook
+# Run PCI-DSS & ISO 27001 Compliance Audit
+soc audit 185.220.101.45
 
-# Network PCAP Packet Forensics
+# Start Production Enterprise REST API Server
+soc server --port 8000
+
+# Start Interactive Cyber Web Dashboard
+soc web --port 8080
+
+# Analyze PCAP capture file
 soc pcap network.pcap
 
-# Malware Executable Static Analysis & ImpHash
+# Static PE Binary Analysis
 soc analyze malware.exe
-
-# Extract Cobalt Strike / AsyncRAT C2 Config
-soc c2-decode "watermark=1234567"
-
-# Perform Automated Log Triage
-soc triage firewall.log
-
-# Decode Obfuscated PowerShell Command
-soc decode "powershell -enc VwByAGkAdABlAC0ASABvAHMAdAAgACcASABlAGwAbABvACc="
-
-# Launch Interactive Cyber Web Dashboard
-soc web
 ```
 
 ---
 
-## 🛠️ Advanced CLI Examples
+## 📜 Compliance & Audit Evidence Frameworks Supported
 
-### 1. Multi-SIEM Query Generation
+| Framework | Controls Mapped | Audit Report Command |
+|-----------|-----------------|---------------------|
+| **PCI-DSS 4.0** | Req 6.4 (App Security), Req 10.4 (Audit Telemetry), Req 11.4 (Threat Defense) | `soc audit <ioc> --pci-dss` |
+| **ISO/IEC 27001:2022** | Control A.8.7 (Malware Protection), A.8.16 (Monitoring), A.8.23 (Web Filtering) | `soc audit <ioc> --iso27001` |
+| **SOC 2 Type II** | CC6.1 (Access Controls), CC6.8 (Threat Detection), CC7.2 (Incident Response) | `soc audit <ioc> --soc2` |
+| **NIST CSF 2.0** | DE.CM-01 (Continuous Monitoring), RS.AN-01 (Incident Analysis) | `soc audit <ioc> --nist-csf` |
+
+---
+
+## ⚡ Enterprise REST API Reference
+
+Start backend server:
 ```bash
-soc 185.220.101.45 --siem-queries
+soc server --port 8000
 ```
-*Outputs instant SPL (Splunk), KQL (Elastic & Sentinel), AQL (QRadar), and CrowdStrike queries.*
 
-### 2. Export MITRE ATT&CK Navigator Heatmap Layer
+### API Endpoints
+- `POST /api/v1/lookup`: Query 35+ threat intel sources for IP, Domain, Hash, or URL.
+- `POST /api/v1/compliance`: Generate regulatory compliance audit evaluation.
+- `GET /api/v1/health`: API health & provider status check.
+
+#### Example API Request:
 ```bash
-soc 185.220.101.45 --mitre-layer attack_layer.json
+curl -X POST http://localhost:8000/api/v1/lookup \
+     -H "Content-Type: application/json" \
+     -d '{"ioc": "185.220.101.45"}'
 ```
 
-### 3. Interactive Threat Relationship Graph
+---
+
+## 🐳 Container & Kubernetes Deployment
+
 ```bash
-soc 185.220.101.45 --graph threat_graph.html
+# Docker Compose 1-Click Launch
+docker-compose up -d
+
+# Kubernetes Production Deployment
+kubectl apply -f k8s/deployment.yaml
 ```
 
 ---
@@ -92,17 +111,16 @@ soc 185.220.101.45 --graph threat_graph.html
 ## 🐍 Python SDK Integration
 
 ```python
-from soc_toolkit import SOCToolkitSDK, PCAPAnalyzer, PEAnalyzer
+from soc_toolkit import SOCToolkitSDK, ComplianceEngine, IOCType, ThreatLevel
 
 sdk = SOCToolkitSDK()
 
-# Threat Analysis
+# Perform Threat Analysis & Compliance Evaluation
 result = sdk.analyze("185.220.101.45")
-print("SIEM Queries:", result["siem_queries"])
+audit = ComplianceEngine.evaluate_compliance("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
 
-# Static Binary Malware Analysis
-pe_info = PEAnalyzer.analyze_file("payload.exe")
-print("ImpHash / Hashes:", pe_info["sha256"], pe_info["entropy"])
+print("Compliance Status:", audit["overall_compliance_status"])
+print("PCI-DSS Controls:", audit["pci_dss"])
 ```
 
 ---

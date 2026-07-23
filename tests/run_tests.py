@@ -10,6 +10,7 @@ from test_playbook import test_critical_ip_playbook, test_clean_domain_playbook
 from test_decoder import test_defang_url, test_refang_url, test_decode_powershell
 from test_sdk import test_sdk_defang_refang, test_sdk_decode
 from test_v4 import test_pe_entropy, test_c2_extraction, test_siem_queries, test_mitre_navigator
+from test_v5 import test_compliance_evaluation, test_taxii_discovery, test_siem_splunk_script
 
 class TestSOCToolkit(unittest.TestCase):
     def test_whitelist(self):
@@ -36,6 +37,11 @@ class TestSOCToolkit(unittest.TestCase):
         test_c2_extraction()
         test_siem_queries()
         test_mitre_navigator()
+
+    def test_v5_features(self):
+        test_compliance_evaluation()
+        test_taxii_discovery()
+        test_siem_splunk_script()
 
 if __name__ == "__main__":
     unittest.main()
