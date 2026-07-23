@@ -776,13 +776,17 @@ class ThreatFoxAPIProvider(BaseLookupProvider):
     """ThreatFox API - Direct abuse.ch IOC API"""
     name = "ThreatFoxAPI"
     supported_types = [IOCType.IP, IOCType.DOMAIN, IOCType.URL, IOCType.HASH_MD5, IOCType.HASH_SHA256]
+    requires_api_key = True
     rate_limit = 1.0
 
     def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
         start = time.time()
+        if not Config.THREATFOX_API_KEY:
+            return LookupResult(source=self.name, found=False, error="API key required", response_time=time.time() - start)
         try:
             payload = {"query": "search_ioc", "search_term": ioc}
-            r = self._make_request("https://threatfox-api.abuse.ch/api/v1/", method="POST", json=payload)
+            headers = {"API-KEY": Config.THREATFOX_API_KEY}
+            r = self._make_request("https://threatfox-api.abuse.ch/api/v1/", method="POST", json=payload, headers=headers)
             r.raise_for_status()
             d = r.json()
             if d.get("query_status") != "ok":
@@ -802,10 +806,13 @@ class URLhausAPIProvider(BaseLookupProvider):
     """URLhaus API - Direct abuse.ch Host / URL API"""
     name = "URLhausAPI"
     supported_types = [IOCType.DOMAIN, IOCType.IP, IOCType.URL]
+    requires_api_key = True
     rate_limit = 1.0
 
     def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
         start = time.time()
+        if not Config.URLHAUS_API_KEY:
+            return LookupResult(source=self.name, found=False, error="API key required", response_time=time.time() - start)
         try:
             if ioc_type == IOCType.URL:
                 data = {"url": ioc}
@@ -814,7 +821,8 @@ class URLhausAPIProvider(BaseLookupProvider):
                 data = {"host": ioc}
                 endpoint = "https://urlhaus-api.abuse.ch/api/v1/host/"
 
-            r = self._make_request(endpoint, method="POST", data=data)
+            headers = {"API-KEY": Config.URLHAUS_API_KEY}
+            r = self._make_request(endpoint, method="POST", data=data, headers=headers)
             r.raise_for_status()
             res = r.json()
             if res.get("query_status") != "ok":
@@ -832,12 +840,16 @@ class MalwareBazaarAPIProvider(BaseLookupProvider):
     """MalwareBazaar API - Direct abuse.ch Hash API"""
     name = "MalwareBazaarAPI"
     supported_types = [IOCType.HASH_MD5, IOCType.HASH_SHA1, IOCType.HASH_SHA256]
+    requires_api_key = True
     rate_limit = 1.0
 
     def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
         start = time.time()
+        if not Config.MALWAREBAZAAR_API_KEY:
+            return LookupResult(source=self.name, found=False, error="API key required", response_time=time.time() - start)
         try:
-            r = self._make_request("https://mb-api.abuse.ch/api/v1/", method="POST", data={"query": "get_info", "hash": ioc})
+            headers = {"API-KEY": Config.MALWAREBAZAAR_API_KEY}
+            r = self._make_request("https://mb-api.abuse.ch/api/v1/", method="POST", data={"query": "get_info", "hash": ioc}, headers=headers)
             r.raise_for_status()
             res = r.json()
             if res.get("query_status") != "ok":
