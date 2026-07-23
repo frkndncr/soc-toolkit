@@ -738,9 +738,154 @@ class AlienVaultOTXProvider(BaseLookupProvider):
 # ═══════════════════════════════════════════════════════════════════════════════
 # PROVIDER REGISTRY
 # ═══════════════════════════════════════════════════════════════════════════════
+# NEW API PROVIDERS (Pulsedive, ThreatFox API, URLhaus API, MalwareBazaar API, Tranco)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class PulsediveProvider(BaseLookupProvider):
+    """Pulsedive - Free API threat intelligence for IP, Domain, Hash, URL"""
+    name = "Pulsedive"
+    supported_types = [IOCType.IP, IOCType.DOMAIN, IOCType.URL, IOCType.HASH_MD5, IOCType.HASH_SHA256]
+    rate_limit = 1.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            r = self._make_request(f"https://pulsedive.com/api/info.php?indicator={quote(ioc)}")
+            if r.status_code == 404:
+                return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+            r.raise_for_status()
+            d = r.json()
+            if "error" in d:
+                return LookupResult(source=self.name, found=False, error=d.get("error"), response_time=time.time() - start)
+
+            risk = d.get("risk", "none").lower()
+            if risk == "critical": threat = ThreatLevel.CRITICAL
+            elif risk == "high": threat = ThreatLevel.HIGH
+            elif risk == "medium": threat = ThreatLevel.MEDIUM
+            elif risk == "low": threat = ThreatLevel.LOW
+            else: threat = ThreatLevel.CLEAN
+
+            return LookupResult(source=self.name, found=True, threat_level=threat,
+                data={"risk": risk, "retired": d.get("retired", "N/A"), "threats": d.get("threats", [])[:3]},
+                response_time=time.time() - start)
+        except Exception as e:
+            return LookupResult(source=self.name, found=False, error=str(e), response_time=time.time() - start)
+
+
+class ThreatFoxAPIProvider(BaseLookupProvider):
+    """ThreatFox API - Direct abuse.ch IOC API"""
+    name = "ThreatFoxAPI"
+    supported_types = [IOCType.IP, IOCType.DOMAIN, IOCType.URL, IOCType.HASH_MD5, IOCType.HASH_SHA256]
+    rate_limit = 1.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            payload = {"query": "search_ioc", "search_term": ioc}
+            r = self._make_request("https://threatfox-api.abuse.ch/api/v1/", method="POST", json=payload)
+            r.raise_for_status()
+            d = r.json()
+            if d.get("query_status") != "ok":
+                return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+            data_list = d.get("data", [])
+            threat = ThreatLevel.CRITICAL if data_list else ThreatLevel.CLEAN
+            first_hit = data_list[0] if data_list else {}
+            return LookupResult(source=self.name, found=len(data_list) > 0, threat_level=threat,
+                data={"malware_printable": first_hit.get("malware_printable", "N/A"), "threat_type": first_hit.get("threat_type", "N/A")},
+                response_time=time.time() - start)
+        except Exception as e:
+            return LookupResult(source=self.name, found=False, error=str(e), response_time=time.time() - start)
+
+
+class URLhausAPIProvider(BaseLookupProvider):
+    """URLhaus API - Direct abuse.ch Host / URL API"""
+    name = "URLhausAPI"
+    supported_types = [IOCType.DOMAIN, IOCType.IP, IOCType.URL]
+    rate_limit = 1.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            if ioc_type == IOCType.URL:
+                data = {"url": ioc}
+                endpoint = "https://urlhaus-api.abuse.ch/api/v1/url/"
+            else:
+                data = {"host": ioc}
+                endpoint = "https://urlhaus-api.abuse.ch/api/v1/host/"
+
+            r = self._make_request(endpoint, method="POST", data=data)
+            r.raise_for_status()
+            res = r.json()
+            if res.get("query_status") != "ok":
+                return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+            threat = ThreatLevel.CRITICAL
+            return LookupResult(source=self.name, found=True, threat_level=threat,
+                data={"urlhaus_reference": res.get("urlhaus_reference", "N/A"), "url_count": res.get("url_count", 1)},
+                response_time=time.time() - start)
+        except Exception as e:
+            return LookupResult(source=self.name, found=False, error=str(e), response_time=time.time() - start)
+
+
+class MalwareBazaarAPIProvider(BaseLookupProvider):
+    """MalwareBazaar API - Direct abuse.ch Hash API"""
+    name = "MalwareBazaarAPI"
+    supported_types = [IOCType.HASH_MD5, IOCType.HASH_SHA1, IOCType.HASH_SHA256]
+    rate_limit = 1.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            r = self._make_request("https://mb-api.abuse.ch/api/v1/", method="POST", data={"query": "get_info", "hash": ioc})
+            r.raise_for_status()
+            res = r.json()
+            if res.get("query_status") != "ok":
+                return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.UNKNOWN, response_time=time.time() - start)
+
+            data = res.get("data", [{}])[0]
+            signature = data.get("signature", "N/A")
+            return LookupResult(source=self.name, found=True, threat_level=ThreatLevel.CRITICAL,
+                data={"signature": signature, "file_type": data.get("file_type", "N/A"), "reporter": data.get("reporter", "N/A")},
+                response_time=time.time() - start)
+        except Exception as e:
+            return LookupResult(source=self.name, found=False, error=str(e), response_time=time.time() - start)
+
+
+class TrancoRankProvider(BaseLookupProvider):
+    """Tranco Top 1M Rank - Domain Popularity Check"""
+    name = "TrancoRank"
+    supported_types = [IOCType.DOMAIN]
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            r = self._make_request(f"https://tranco-list.eu/api/ranks/domain/{quote(ioc)}")
+            if r.status_code == 404:
+                return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.UNKNOWN, response_time=time.time() - start)
+            r.raise_for_status()
+            ranks = r.json().get("ranks", [])
+            latest_rank = ranks[0].get("rank") if ranks else None
+
+            if latest_rank and latest_rank < 50000:
+                threat = ThreatLevel.CLEAN
+                msg = f"Top {latest_rank} Popular Domain (Benign)"
+            else:
+                threat = ThreatLevel.UNKNOWN
+                msg = f"Rank: {latest_rank}" if latest_rank else "Not in top list"
+
+            return LookupResult(source=self.name, found=bool(latest_rank), threat_level=threat,
+                data={"rank": latest_rank or "N/A", "info": msg}, response_time=time.time() - start)
+        except Exception as e:
+            return LookupResult(source=self.name, found=False, error=str(e), response_time=time.time() - start)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PROVIDER REGISTRY
+# ═══════════════════════════════════════════════════════════════════════════════
 
 ALL_PROVIDERS = [
-    # FREE - API Based (7)
+    # FREE - API Based (12)
     ShodanInternetDBProvider,
     IPAPIProvider,
     GreyNoiseProvider,
@@ -748,6 +893,11 @@ ALL_PROVIDERS = [
     URLScanProvider,
     IPInfoProvider,
     CIRCLHashlookupProvider,
+    PulsediveProvider,
+    ThreatFoxAPIProvider,
+    URLhausAPIProvider,
+    MalwareBazaarAPIProvider,
+    TrancoRankProvider,
     
     # FREE - DNS Blacklist (1)
     DNSBLProvider,
@@ -780,3 +930,4 @@ ALL_PROVIDERS = [
 PROVIDER_COUNT = len(ALL_PROVIDERS)
 FREE_PROVIDERS = [p for p in ALL_PROVIDERS if not p.requires_api_key]
 PREMIUM_PROVIDERS = [p for p in ALL_PROVIDERS if p.requires_api_key]
+

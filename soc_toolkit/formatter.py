@@ -1,5 +1,5 @@
 """
-Output formatting and export for SOC Toolkit
+Output formatting and export for SOC Toolkit v3.0.0
 """
 
 import json
@@ -15,6 +15,8 @@ from rich import box
 
 from .enums import ThreatLevel, IOCReport, LookupResult
 from .config import Config
+from .playbook import PlaybookGenerator
+from .osint import OSINTLinksGenerator
 
 
 # Threat level styling
@@ -54,11 +56,11 @@ class OutputFormatter:
 ███████║╚██████╔╝╚██████╗       ██║   ╚██████╔╝╚██████╔╝███████╗██║  ██╗██║   ██║   
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 [/]
-[dim]SOC Analyst Workbench v{version} | github.com/frkndncr/soc-toolkit[/]
+[dim]SOC Analyst Workbench v{version} | Enterprise Threat Intelligence & Incident Response[/]
         """.format(version=Config.VERSION)
         self.console.print(banner)
         
-    def print_report(self, report: IOCReport):
+    def print_report(self, report: IOCReport, show_playbook: bool = False, show_osint: bool = True):
         """Print formatted report to console"""
         
         # Header panel
@@ -86,14 +88,13 @@ class OutputFormatter:
             show_header=True, 
             header_style="bold magenta"
         )
-        table.add_column("Source", style="cyan", width=15)
-        table.add_column("Status", width=12)
+        table.add_column("Source", style="cyan", width=16)
+        table.add_column("Status", width=10)
         table.add_column("Threat", width=12)
         table.add_column("Details", style="dim", max_width=45)
         table.add_column("Time", width=8, justify="right")
         
         for result in report.results:
-            # Status
             if result.error:
                 status = "[red]❌ Error[/]"
             elif result.found:
@@ -101,12 +102,10 @@ class OutputFormatter:
             else:
                 status = "[dim]⚪ None[/]"
                 
-            # Threat level
             icon = THREAT_ICONS.get(result.threat_level, "⚪")
             color = THREAT_COLORS.get(result.threat_level, "white")
             threat_str = f"[{color}]{icon} {result.threat_level.value.title()}[/]"
             
-            # Details
             details = []
             if result.error:
                 details.append(result.error[:40])
@@ -118,72 +117,118 @@ class OutputFormatter:
                         details.append(f"{key}: {str(value)[:25]}")
                         
             details_str = " | ".join(details) if details else "-"
-            
-            # Response time
             time_str = f"{result.response_time:.2f}s" if result.response_time else "-"
-            
             table.add_row(result.source, status, threat_str, details_str, time_str)
             
         self.console.print(table)
         
-        # Detailed findings for malicious
-        malicious_results = [
-            r for r in report.results 
-            if r.found and r.threat_level in [ThreatLevel.HIGH, ThreatLevel.CRITICAL]
-        ]
-        
-        if malicious_results:
-            self.console.print("\n[bold red]⚠️  THREAT DETAILS[/]\n")
-            
-            for result in malicious_results:
-                detail_table = Table(
-                    title=f"[bold]{result.source}[/]", 
-                    box=box.SIMPLE, 
-                    show_header=False
-                )
-                detail_table.add_column("Field", style="cyan", width=20)
-                detail_table.add_column("Value", style="white")
-                
-                for key, value in result.data.items():
-                    if value and value != "N/A":
-                        if isinstance(value, list):
-                            value = ", ".join(str(v) for v in value)
-                        detail_table.add_row(key, str(value))
-                        
-                self.console.print(detail_table)
-                self.console.print()
+        # OSINT Quick Links
+        if show_osint:
+            links = OSINTLinksGenerator.get_links(report.ioc, report.ioc_type)
+            if links:
+                self.console.print("\n[bold cyan]🔗 OSINT INVESTIGATION LINKS[/]")
+                for name, url in links.items():
+                    self.console.print(f"  • [bold]{name}:[/] [dim underline]{url}[/]")
 
-    def print_providers(self, providers: dict):
-        """Print provider status table"""
-        table = Table(
-            title="🔌 Available Providers", 
-            box=box.ROUNDED,
-            show_header=True
-        )
-        table.add_column("Provider", style="cyan")
-        table.add_column("API Key", width=12)
-        table.add_column("Status", width=10)
-        table.add_column("Supported Types", style="dim")
-        
-        for name, info in providers.items():
-            if info["requires_api_key"]:
-                if info["has_api_key"]:
-                    api_status = "[green]✓ Set[/]"
-                else:
-                    api_status = "[yellow]⚠ Required[/]"
-            else:
-                api_status = "[dim]Free[/]"
-                
-            status = "[green]✓ Ready[/]" if info["enabled"] else "[red]✗ Disabled[/]"
-            types = ", ".join(info["supported_types"])
-            
-            table.add_row(name, api_status, status, types)
-            
-        self.console.print(table)
-                
+        # Playbook output
+        if show_playbook or report.overall_threat_level in (ThreatLevel.HIGH, ThreatLevel.CRITICAL):
+            playbook = PlaybookGenerator.generate(report.ioc, report.ioc_type, report.overall_threat_level)
+            self.console.print("\n" + Panel(
+                playbook.to_markdown(),
+                title="[bold red]🛡️ Incident Response Playbook[/]",
+                border_style="red"
+            ))
+
+    def export_html(self, report: IOCReport, filepath: Union[str, Path]):
+        """Export report to single-file interactive HTML report"""
+        links = OSINTLinksGenerator.get_links(report.ioc, report.ioc_type)
+        playbook = PlaybookGenerator.generate(report.ioc, report.ioc_type, report.overall_threat_level)
+
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SOC Report - {report.ioc}</title>
+    <style>
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 30px; line-height: 1.5; }}
+        .card {{ background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 20px; }}
+        h1, h2, h3 {{ color: #58a6ff; }}
+        .badge {{ padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 14px; display: inline-block; }}
+        .badge-CRITICAL {{ background: #da3633; color: white; }}
+        .badge-HIGH {{ background: #d96f00; color: white; }}
+        .badge-CLEAN {{ background: #238636; color: white; }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
+        th, td {{ border: 1px solid #30363d; padding: 10px; text-align: left; }}
+        th {{ background: #21262d; color: #8b949e; }}
+        a {{ color: #58a6ff; }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🛡️ SOC Threat Intelligence Report</h1>
+        <p><strong>IOC:</strong> <code>{report.ioc}</code> | <strong>Type:</strong> {report.ioc_type.value.upper()}</p>
+        <p><strong>Threat Level:</strong> <span class="badge badge-{report.overall_threat_level.value.upper()}">{report.overall_threat_level.value.upper()}</span></p>
+        <p>{report.summary}</p>
+    </div>
+
+    <div class="card">
+        <h2>🔗 OSINT Investigation Links</h2>
+        <ul>
+"""
+        for name, url in links.items():
+            html += f'            <li><a href="{url}" target="_blank">{name}</a></li>\n'
+        html += """        </ul>
+    </div>
+
+    <div class="card">
+        <h2>🔎 Source Lookup Results</h2>
+        <table>
+            <tr><th>Provider</th><th>Found</th><th>Threat Level</th><th>Response Time</th></tr>
+"""
+        for r in report.results:
+            found_str = "✅ Yes" if r.found else "⚪ No"
+            html += f'            <tr><td>{r.source}</td><td>{found_str}</td><td>{r.threat_level.value}</td><td>{r.response_time:.2f}s</td></tr>\n'
+
+        html += f"""        </table>
+    </div>
+
+    <div class="card">
+        <h2>🛡️ Incident Response Containment Playbook</h2>
+        <div>{playbook.to_markdown().replace('\n', '<br>')}</div>
+    </div>
+</body>
+</html>"""
+
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(html)
+        self.console.print(f"[green]✅ HTML Report saved: {filepath}[/]")
+
+    def export_stix(self, report: IOCReport, filepath: Union[str, Path]):
+        """Export report to STIX 2.1 JSON Bundle"""
+        stix_bundle = {
+            "type": "bundle",
+            "id": f"bundle--{hash(report.ioc) & 0xffffffff:08x}-1111-2222-3333-444444444444",
+            "objects": [
+                {
+                    "type": "indicator",
+                    "spec_version": "2.1",
+                    "id": f"indicator--{hash(report.ioc) & 0xffffffff:08x}-1111-2222-3333-444444444444",
+                    "created": report.timestamp,
+                    "modified": report.timestamp,
+                    "name": f"SOC Toolkit Finding - {report.ioc}",
+                    "indicator_types": ["malicious-activity"],
+                    "pattern": f"[{report.ioc_type.value}:value = '{report.ioc}']",
+                    "pattern_type": "stix",
+                    "valid_from": report.timestamp
+                }
+            ]
+        }
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(stix_bundle, f, indent=2)
+        self.console.print(f"[green]✅ STIX 2.1 Bundle saved: {filepath}[/]")
+
     def export_json(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to JSON file"""
-        
         def serialize(obj):
             if isinstance(obj, Enum):
                 return obj.value
@@ -202,78 +247,34 @@ class OutputFormatter:
         
     def export_markdown(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to Markdown file"""
-        
-        md = f"""# 🔍 IOC Analysis Report
-
-## Summary
+        md = f"""# 🔍 IOC Analysis Report - {report.ioc}
 
 | Field | Value |
 |-------|-------|
 | **IOC** | `{report.ioc}` |
 | **Type** | {report.ioc_type.value.upper()} |
 | **Time** | {report.timestamp} |
-| **Threat Level** | {THREAT_ICONS.get(report.overall_threat_level, '')} {report.overall_threat_level.value.upper()} |
+| **Threat Level** | {report.overall_threat_level.value.upper()} |
 
 {report.summary}
-
----
-
-## 📊 Source Results
-
-| Source | Status | Threat | Time |
-|--------|--------|--------|------|
 """
-        
-        for result in report.results:
-            status = "✅" if result.found else ("❌" if result.error else "⚪")
-            icon = THREAT_ICONS.get(result.threat_level, "⚪")
-            threat = f"{icon} {result.threat_level.value}"
-            time_str = f"{result.response_time:.2f}s" if result.response_time else "-"
-            md += f"| {result.source} | {status} | {threat} | {time_str} |\n"
-            
-        md += "\n---\n\n## 📋 Detailed Findings\n\n"
-        
-        for result in report.results:
-            if result.found and result.data:
-                md += f"### {result.source}\n\n"
-                md += "| Field | Value |\n|-------|-------|\n"
-                for key, value in result.data.items():
-                    if value and value != "N/A":
-                        if isinstance(value, list):
-                            value = ", ".join(str(v) for v in value[:5])
-                        md += f"| {key} | {value} |\n"
-                md += "\n"
-                
-        md += f"""
----
-
-*Report generated by SOC Toolkit v{Config.VERSION}*  
-*https://github.com/frkndncr/soc-toolkit*
-"""
-        
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(md)
-            
         self.console.print(f"[green]✅ Markdown report saved: {filepath}[/]")
 
     def export_csv(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to CSV file"""
         import csv
-        
         with open(filepath, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow(['IOC', 'Type', 'Source', 'Found', 'Threat Level', 'Response Time', 'Details'])
-            
+            writer.writerow(['IOC', 'Type', 'Source', 'Found', 'Threat Level', 'Response Time'])
             for result in report.results:
-                details = json.dumps(result.data) if result.data else ""
                 writer.writerow([
                     report.ioc,
                     report.ioc_type.value,
                     result.source,
                     result.found,
                     result.threat_level.value,
-                    f"{result.response_time:.2f}",
-                    details
+                    f"{result.response_time:.2f}"
                 ])
-                
         self.console.print(f"[green]✅ CSV report saved: {filepath}[/]")

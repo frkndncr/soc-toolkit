@@ -1,5 +1,5 @@
 """
-Core SOC Toolkit Engine
+Core SOC Toolkit Engine v3.0.0
 """
 
 import concurrent.futures
@@ -10,18 +10,13 @@ from .enums import IOCType, ThreatLevel, LookupResult, IOCReport
 from .detectors import IOCDetector
 from .config import Config
 from .providers import ALL_PROVIDERS
+from .whitelist import WhitelistFilter
 
 
 class SOCToolkit:
     """Main SOC Toolkit engine for IOC lookups"""
     
     def __init__(self, providers=None):
-        """
-        Initialize SOC Toolkit
-        
-        Args:
-            providers: List of provider classes to use. Defaults to all providers.
-        """
         if providers is None:
             providers = ALL_PROVIDERS
             
@@ -30,15 +25,8 @@ class SOCToolkit:
     def lookup(self, ioc: str, ioc_type: Optional[IOCType] = None) -> IOCReport:
         """
         Perform comprehensive IOC lookup across all providers
-        
-        Args:
-            ioc: The indicator to lookup (IP, domain, hash, URL)
-            ioc_type: Force specific IOC type. Auto-detected if not provided.
-            
-        Returns:
-            IOCReport with all results
         """
-        # Clean input
+        # Clean input & refang
         ioc = IOCDetector.refang(ioc.strip())
         
         # Auto-detect IOC type if not provided
@@ -53,6 +41,9 @@ class SOCToolkit:
                 summary="❌ Could not detect IOC type"
             )
             
+        # Check Whitelist / False Positive Filter first
+        whitelist_eval = WhitelistFilter.evaluate(ioc, ioc_type.value)
+
         # Filter applicable providers
         applicable_providers = [
             p for p in self.providers 
@@ -61,7 +52,7 @@ class SOCToolkit:
         
         results = []
         
-        # Parallel lookup
+        # Parallel lookup across providers
         with concurrent.futures.ThreadPoolExecutor(max_workers=Config.MAX_WORKERS) as executor:
             future_to_provider = {
                 executor.submit(p.lookup, ioc, ioc_type): p 
@@ -83,8 +74,12 @@ class SOCToolkit:
         # Calculate overall threat level
         overall_threat = self._calculate_overall_threat(results)
         
+        # Override overall threat level if Whitelist Filter matched known benign infrastructure
+        if whitelist_eval.get("is_benign"):
+            overall_threat = ThreatLevel.CLEAN
+
         # Generate summary
-        summary = self._generate_summary(results, overall_threat)
+        summary = self._generate_summary(results, overall_threat, whitelist_eval)
         
         return IOCReport(
             ioc=ioc,
@@ -119,9 +114,16 @@ class SOCToolkit:
         return ThreatLevel.UNKNOWN
         
     def _generate_summary(self, results: List[LookupResult], 
-                          overall_threat: ThreatLevel) -> str:
+                          overall_threat: ThreatLevel,
+                          whitelist_eval: dict = None) -> str:
         """Generate human-readable summary"""
+        whitelist_eval = whitelist_eval or {}
         
+        if whitelist_eval.get("is_benign"):
+            summary = f"🟢 CLEAN - {whitelist_eval.get('reason')}\n"
+            summary += "🛡️ False Positive Filter: Verified Legitimate Infrastructure"
+            return summary
+
         threat_descriptions = {
             ThreatLevel.CLEAN: "✅ CLEAN - No threats detected",
             ThreatLevel.LOW: "🟢 LOW RISK - Minimal threat indicators",

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit
+# 🛡️ SOC Toolkit v3.0.0 Enterprise
 
 ```
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -11,250 +11,144 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### SOC Analyst Workbench - All-in-One Threat Intelligence Tool
+### Enterprise SOC Analyst Workbench - Threat Intelligence, Incident Response Playbooks & Log Triage
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Providers](https://img.shields.io/badge/providers-28-orange.svg)](#-providers)
-[![Free](https://img.shields.io/badge/free%20sources-25-brightgreen.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](#)
+[![Providers](https://img.shields.io/badge/providers-35+-orange.svg)](#-providers)
+[![Version](https://img.shields.io/badge/version-3.0.0--enterprise-blue.svg)](#)
+[![CI Status](https://github.com/frkndncr/soc-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/frkndncr/soc-toolkit/actions)
 
-**🔍 28 Threat Intel Sources | 🆓 25 FREE (No API Key!) | 🎯 MITRE ATT&CK | ⚡ Parallel Queries**
+**🔍 35+ Threat Intel Sources | 🛡️ IR Playbooks | 🌐 Cyber Web GUI | 🪵 Log Triage | 🔓 Payload Decoder | 📜 YARA/Sigma Rules**
 
 </div>
 
 ---
 
-## ⭐ Why SOC Toolkit?
+## ⭐ Why Enterprise SOC Toolkit v3.0.0?
 
-Most threat intelligence tools require API keys for every source. **SOC Toolkit is different:**
+Standard threat intelligence tools often generate alert fatigue and lack actionable incident response steps. **SOC Toolkit v3.0.0** is built for real-world SOC operations:
 
-- ✅ **25 sources work without any API key**
-- ✅ **Instant setup** - just `pip install` and go
-- ✅ **Real blocklists** from abuse.ch, Spamhaus, EmergingThreats, and more
-- ✅ **One command** queries all sources in parallel
+- 🛡️ **Incident Response Playbook Generator**: Step-by-step containment (`iptables` / endpoint isolation), eradication, and recovery guidelines for every alert.
+- 🟢 **False Positive & Cloud Infrastructure Filter**: Automatically detects Google DNS, Cloudflare, Akamai, and AWS infrastructure to eliminate false alarms.
+- 🌐 **Interactive Cyber Web GUI (`soc web`)**: Zero-dependency dark-mode dashboard for web-based triage.
+- 🪵 **Automated Log & Forensics Triage (`soc triage file.log`)**: Scans log dumps, refangs IOCs, ranks critical threats, and outputs executive threat summaries.
+- 🔓 **PowerShell & Defang Decoder (`soc decode`)**: Instantly decodes `powershell -enc` base64 payloads and defanged URLs (`hXXps://`).
+- 📜 **SIEM & NIDS Rule Generation**: Auto-generates Sigma rules, YARA rules, and Snort/Suricata drop statements.
+- 🐍 **Python SDK (`import soc_toolkit`)**: Easily embed into SOAR workflows (Shuffle, DFIR-IRIS, Cortex) or Jupyter Notebooks.
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# Install
+# Install package
 pip install soc-toolkit
 
-# Analyze an IP
+# Analyze an IP address
 soc 185.220.101.45
 
-# That's it! No API keys needed.
+# Generate Incident Containment Playbook
+soc 185.220.101.45 --playbook
+
+# Perform Automated Log Triage
+soc triage firewall.log
+
+# Decode Obfuscated PowerShell Command
+soc decode "powershell -enc VwByAGkAdABlAC0ASABvAHMAdAAgACcASABlAGwAbABvACc="
+
+# Launch Interactive Cyber Web Dashboard
+soc web
 ```
 
 ---
 
-## 📊 Example Output
+## 🔌 Threat Intelligence Providers (35+ Total)
 
-```
-╔════════════════════════════════════════════════════════════════╗
-║ 🔍 IOC: 185.220.101.45                                         ║
-║ 📋 Type: IP                                                    ║
-║ 🔴 CRITICAL - Known malicious indicator!                       ║
-║ 📊 Found in 8/23 sources | ⚠️  2 sources flagged as malicious   ║
-╚════════════════════════════════════════════════════════════════╝
+### 🆓 FREE - No API Key Required
+- **Pulsedive**: Risk score & indicator properties
+- **ThreatFox Direct API**: Official abuse.ch C2 & IOC database
+- **URLhaus Direct API**: Official abuse.ch malware URL database
+- **MalwareBazaar Direct API**: Official abuse.ch malware sample hash lookup
+- **Tranco Top 1M Rank**: Popular domain validation to suppress false positives
+- **Shodan InternetDB**: Open ports & CVEs
+- **IP-API**: GeoIP & proxy detection
+- **GreyNoise Community**: Scanner detection
+- **StopForumSpam**: Spam database
+- **URLScan.io**: Web page analysis
+- **IPInfo**: Geolocation
+- **CIRCL Hashlookup**: Known file database
+- **DNSBL**: 6 major DNS blacklists (Spamhaus, SpamCop, SORBS, Barracuda, CBL, UCEProtect)
+- **17 Blocklist Feeds**: EmergingThreats, CINS Army, Blocklist.de, Feodo Tracker, SSLBL, Tor Exit Nodes, Spamhaus DROP, Binary Defense, GreenSnow, IPsum L3+, DShield, BruteForce Blocker, PhishingDB, OpenPhish.
 
-┌─────────────────┬──────────┬──────────┬─────────────────────────┐
-│ Source          │ Status   │ Threat   │ Details                 │
-├─────────────────┼──────────┼──────────┼─────────────────────────┤
-│ DNSBL           │ ✅ Found │ 🔴 Crit  │ 3/6 blacklists          │
-│ IPsum           │ ✅ Found │ 🔴 Crit  │ 3+ blacklist hits       │
-│ TorExit         │ ✅ Found │ 🟡 Med   │ TOR EXIT NODE           │
-│ GreyNoise       │ ✅ Found │ 🔵 Low   │ suspicious, noise=True  │
-│ Shodan          │ ✅ Found │ 🔵 Low   │ ports: 80               │
-│ IP-API          │ ✅ Found │ 🟢 Clean │ Germany, Brandenburg    │
-└─────────────────┴──────────┴──────────┴─────────────────────────┘
-```
-
----
-
-## 🔌 Providers (28 Total)
-
-### 🆓 FREE - No API Key Required (25)
-
-#### API-Based (7)
-| Provider | Types | Description |
-|----------|-------|-------------|
-| Shodan InternetDB | IP | Open ports, CVEs |
-| IP-API | IP | GeoIP, proxy detection |
-| GreyNoise | IP | Scanner detection |
-| StopForumSpam | IP, Email | Spam database |
-| URLScan.io | URL, Domain | URL analysis |
-| IPInfo | IP | Geolocation |
-| CIRCL Hashlookup | Hash | Known file database |
-
-#### DNS Blacklist (1)
-| Provider | Types | Description |
-|----------|-------|-------------|
-| DNSBL | IP | Checks 6 major blacklists (Spamhaus, SpamCop, SORBS, Barracuda, CBL, UCEProtect) |
-
-#### Blocklist Downloads (17)
-| Provider | Source | Description |
-|----------|--------|-------------|
-| EmergingThreats | Proofpoint | Compromised IPs |
-| CINS Army | Sentinel IPS | Bad reputation IPs |
-| Blocklist.de | Community | Attack source IPs |
-| Feodo Tracker | abuse.ch | Botnet C2 servers |
-| SSLBL | abuse.ch | Malicious SSL certs |
-| Tor Exit Nodes | torproject.org | Tor exit detection |
-| Spamhaus DROP | Spamhaus | Hijacked networks |
-| Binary Defense | BinaryDefense | Threat IPs |
-| GreenSnow | GreenSnow | Attack IPs |
-| IPsum | stamparm | 3+ blacklist aggregator |
-| DShield | SANS ISC | Top attackers |
-| BruteForce Blocker | danger.rulez.sk | SSH/FTP attackers |
-| URLhaus | abuse.ch | Malware URLs |
-| ThreatFox | abuse.ch | IOC database |
-| MalwareBazaar | abuse.ch | Malware hashes |
-| Phishing Database | Community | Phishing domains |
-| OpenPhish | OpenPhish | Phishing URLs |
-
-### 🔑 Premium - API Key Required (3)
-
-| Provider | Free Tier | Get Key |
-|----------|-----------|---------|
-| VirusTotal | 500/day | [virustotal.com](https://virustotal.com) |
-| AbuseIPDB | 1000/day | [abuseipdb.com](https://abuseipdb.com) |
-| AlienVault OTX | Unlimited | [otx.alienvault.com](https://otx.alienvault.com) |
+### 🔑 Premium - API Key Supported
+- **VirusTotal**: Multi-engine AV scanning
+- **AbuseIPDB**: IP abuse reports
+- **AlienVault OTX**: Threat pulses
 
 ---
 
-## 💡 Usage
+## 🛠️ CLI Usage & Features
 
+### 1. Single IOC Analysis & Playbook
 ```bash
-# IP Analysis
-soc 185.220.101.45
-
-# Domain Analysis
-soc evil-domain.com
-
-# Hash Analysis
-soc 44d88612fea8a8f36de82e1278abb02f
-
-# MITRE ATT&CK Mapping
-soc 185.220.101.45 --mitre
-
-# WHOIS & DNS Enrichment
-soc evil.com --enrich
-
-# Extract IOCs from log file
-soc -e /var/log/firewall.log
-
-# Batch analysis
-soc -f iocs.txt -o ./reports/
-
-# Interactive mode
-soc -i
-
-# Export formats
-soc 1.2.3.4 --json out.json
-soc 1.2.3.4 --md report.md
+soc 185.220.101.45 --playbook --osint
 ```
 
----
-
-## 🔑 Optional: Add API Keys
-
-For even more coverage, add these free API keys:
-
+### 2. Export Formats (HTML & STIX 2.1)
 ```bash
-export VIRUSTOTAL_API_KEY="your-key"
-export ABUSEIPDB_API_KEY="your-key"
-export OTX_API_KEY="your-key"
+# Interactive HTML Report
+soc 185.220.101.45 --html report.html
+
+# STIX 2.1 JSON Bundle
+soc 185.220.101.45 --stix report.stix.json
+
+# JSON / CSV / Markdown
+soc 185.220.101.45 --json report.json --csv report.csv
 ```
 
----
-
-## 🎯 MITRE ATT&CK Mapping
-
+### 3. Generate SIEM Detection Rules
 ```bash
-soc 185.220.101.45 --mitre
+# Generate Sigma Rule
+soc 185.220.101.45 --sigma
+
+# Generate YARA Rule
+soc 44d88612fea8a8f36de82e1278abb02f --yara
 ```
 
-```
-🎯 MITRE ATT&CK Mapping
-
-  📌 Credential Access
-    🔴 T1110: Brute Force
-
-  📌 Command and Control
-    🟡 T1071: Application Layer Protocol
-
-  📌 Initial Access
-    🟢 T1190: Exploit Public-Facing Application
-```
-
----
-
-## 📦 Installation
-
+### 4. Defang / Refang URLs & Obfuscated Command Decoding
 ```bash
-# From PyPI
-pip install soc-toolkit
+# Defang URL
+soc defang "https://evil.com/payload"
+# Output: hXXps://evil[.]com/payload
 
-# From source
-git clone https://github.com/frkndncr/soc-toolkit.git
-cd soc-toolkit
-pip install -e .
-
-# Verify
-soc --version
-soc --providers
+# Refang URL
+soc refang "hXXps://evil[.]com/payload"
+# Output: https://evil.com/payload
 ```
 
 ---
 
-## 📝 Changelog
+## 🐍 Python SDK Integration
 
-### v2.1.0 (December 2025) 🆕
-- 🔥 **25 FREE providers** - no API key required!
-- ➕ Added 17 blocklist-based providers
-- ➕ EmergingThreats, CINS Army, Blocklist.de
-- ➕ Spamhaus DROP, Binary Defense, GreenSnow
-- ➕ IPsum, DShield, BruteForce Blocker
-- ➕ Phishing Database, OpenPhish
-- 🔄 Smart blocklist caching (1 hour)
-- ⚡ Parallel queries for faster results
+Embed **SOC Toolkit** into your Python scripts or SOAR pipelines:
 
-### v2.0.0 (December 2025)
-- Updated all providers to latest APIs
-- Added MITRE ATT&CK mapping
-- Added WHOIS & DNS enrichment
+```python
+from soc_toolkit import SOCToolkitSDK
 
-### v1.0.0
-- Initial release with 19 providers
+sdk = SOCToolkitSDK()
+
+# Perform full threat analysis
+result = sdk.analyze("185.220.101.45")
+
+print("Threat Level:", result["threat_level"])
+print("Playbook Containment:", result["playbook"].containment_actions)
+print("Sigma Rule:", result["sigma_rule"])
+```
 
 ---
 
-## 🤝 Contributing
+## 📜 License & Author
 
-Contributions welcome! Feel free to submit issues and pull requests.
-
----
-
-## 👨‍💻 Author
-
-**Furkan Dinçer** - Security Engineer
-
-[![GitHub](https://img.shields.io/badge/GitHub-frkndncr-black?logo=github)](https://github.com/frkndncr)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://linkedin.com/in/furkan-dincer)
-
----
-
-## 📄 License
-
-MIT License - feel free to use in your projects!
-
----
-
-<div align="center">
-
-**⭐ Star this repo if you find it useful!**
-
-</div>
+- **Author**: Furkan Dinçer ([@frkndncr](https://github.com/frkndncr))
+- **License**: MIT License
