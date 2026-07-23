@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soc-toolkit"
-version = "5.0.0"
-description = "🛡️ Enterprise SOC Analyst Workbench v5.0 Mandatory - Compliance Audit | REST API Server | STIX/TAXII | 35+ Sources"
+version = "6.0.0"
+description = "🛡️ SOC Toolkit v6.0 Autonomous AI Cyber Security Suite - AI Triage | Active Defense | SIEM Correlator | SOAR Engine"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"

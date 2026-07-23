@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit v5.0.0 Ultimate Enterprise Mandate
+# 🛡️ SOC Toolkit v6.0.0 Military & Enterprise Security Suite
 
 ```
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -11,32 +11,34 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### The Mandatory Security Operations & Regulatory Compliance Platform for Enterprise SOC Teams
+### Autonomous AI Threat Intelligence, Active Defense, SIEM Correlation & SOAR Platform
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Providers](https://img.shields.io/badge/providers-35+-orange.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-5.0.0--enterprise-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-6.0.0--suite-blue.svg)](#)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![Kubernetes](https://img.shields.io/badge/k8s-ready-326ce5.svg)](k8s/deployment.yaml)
 [![CI Status](https://github.com/frkndncr/soc-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/frkndncr/soc-toolkit/actions)
 
-**📜 Regulatory Compliance Audit | ⚡ Enterprise REST API | 📡 STIX/TAXII 2.1 | 🔌 Splunk/SIEM Apps | 📦 PCAP & PE Analysis**
+**🤖 Autonomous AI Analyst | ⚡ Active Deception | 🔄 SOAR Playbooks | 📜 Compliance Engine | 🕸️ 3D Threat Map**
 
 </div>
 
 ---
 
-## ⭐ Why Enterprise SOC Toolkit v5.0.0 is Mandatory for Every SOC Team
+## ⭐ Why SOC Toolkit v6.0.0 is the Ultimate Cyber Warfare Platform
 
-**SOC Toolkit v5.0.0** is the mandatory security operations platform designed for enterprise Security Operations Centers (SOC), CISOs, Compliance Officers, and Incident Responders:
+**SOC Toolkit v6.0.0** combines Threat Intelligence, AI Root Cause Analysis, Active Defense Deception, SIEM Event Correlation, and SOAR Playbook Execution into a single, unified cyber security platform:
 
-- 📜 **Regulatory Compliance & Audit Engine (`soc audit`)**: Automatically maps security findings, malicious IOCs, and asset threats to **PCI-DSS 4.0**, **ISO/IEC 27001:2022**, **SOC 2 Type II**, and **NIST CSF 2.0** regulatory controls.
-- ⚡ **Production REST API Backend (`soc server`)**: High-performance RESTful JSON backend supporting API key authentication, rate limiting, and CORS headers for central enterprise querying.
-- 📡 **STIX / TAXII 2.1 Server Endpoint (`soc taxii-server`)**: TAXII 2.1 compliant feed server allowing enterprise firewalls (Palo Alto, Fortinet, Check Point) and EDRs (CrowdStrike, Defender) to pull threat feeds.
-- 🔌 **Out-of-the-Box SIEM & SOAR Integration Plugins**: Custom Splunk search commands (`| soclookup`), Elastic ingest pipelines, and Shuffle / Cortex XSOAR playbook schemas.
-- 🐳 **Docker & Kubernetes Enterprise Ready**: Multi-stage `Dockerfile`, `docker-compose.yml`, and `k8s/deployment.yaml` with Ingress and autoscaling.
-- 📦 **PCAP Packet Forensics & Static PE Malware Analysis**: Native network packet capture inspection and executable ImpHash / section entropy scoring.
+- 🤖 **Autonomous AI Security Analyst (`soc ai <ioc>`)**: Generates Root Cause Analysis (RCA), Cyber Kill Chain Phase Attribution (Recon -> Delivery -> Exploitation -> C2 -> Exfiltration), and CISO Triage Summaries.
+- ⚡ **Active Defense & HoneyTokens (`ActiveDefenseEngine`)**: Deploys Canary URLs, decoy AWS keys, and executes active OS firewall banning (`netsh`, `iptables`, `nftables`, `pfctl`, Fortinet/Palo Alto APIs).
+- 💻 **Interactive Terminal Analyst Shell (`soc shell`)**: Interactive threat hunting shell console with live telemetry feeds and continuous prompt mode.
+- 🔄 **Built-in SOAR Automation Engine (`soc soar <ioc>`)**: Executes automated action workflows (isolate endpoint, generate firewall drop rules, alert SIEM bus).
+- 📜 **Regulatory Compliance Audit (`soc audit <ioc>`)**: Maps findings to **PCI-DSS 4.0**, **ISO/IEC 27001:2022**, **SOC 2 Type II**, and **NIST CSF 2.0**.
+- ⚡ **Production REST API Backend (`soc server --port 8000`)**: JSON API backend supporting API key auth and CORS headers.
+- 🕸️ **3D Cyber Threat Map Dashboard (`soc web --port 8080`)**: Live WebGL cyber threat map with attack vectors and threat gauges.
+- 📦 **PCAP Packet Forensics & PE Malware Analysis**: Native network capture inspection and binary ImpHash / entropy analysis.
 
 ---
 
@@ -46,16 +48,25 @@
 # Install package
 pip install soc-toolkit
 
+# Launch Interactive Analyst Terminal Shell
+soc shell
+
+# Autonomous AI Security Analyst Triage
+soc ai 185.220.101.45
+
+# Trigger SOAR Automated Action Workflow
+soc soar 185.220.101.45
+
 # Run PCI-DSS & ISO 27001 Compliance Audit
 soc audit 185.220.101.45
 
 # Start Production Enterprise REST API Server
 soc server --port 8000
 
-# Start Interactive Cyber Web Dashboard
+# Start 3D Cyber Threat Dashboard
 soc web --port 8080
 
-# Analyze PCAP capture file
+# Analyze PCAP Packet Capture
 soc pcap network.pcap
 
 # Static PE Binary Analysis
@@ -64,63 +75,20 @@ soc analyze malware.exe
 
 ---
 
-## 📜 Compliance & Audit Evidence Frameworks Supported
-
-| Framework | Controls Mapped | Audit Report Command |
-|-----------|-----------------|---------------------|
-| **PCI-DSS 4.0** | Req 6.4 (App Security), Req 10.4 (Audit Telemetry), Req 11.4 (Threat Defense) | `soc audit <ioc> --pci-dss` |
-| **ISO/IEC 27001:2022** | Control A.8.7 (Malware Protection), A.8.16 (Monitoring), A.8.23 (Web Filtering) | `soc audit <ioc> --iso27001` |
-| **SOC 2 Type II** | CC6.1 (Access Controls), CC6.8 (Threat Detection), CC7.2 (Incident Response) | `soc audit <ioc> --soc2` |
-| **NIST CSF 2.0** | DE.CM-01 (Continuous Monitoring), RS.AN-01 (Incident Analysis) | `soc audit <ioc> --nist-csf` |
-
----
-
-## ⚡ Enterprise REST API Reference
-
-Start backend server:
-```bash
-soc server --port 8000
-```
-
-### API Endpoints
-- `POST /api/v1/lookup`: Query 35+ threat intel sources for IP, Domain, Hash, or URL.
-- `POST /api/v1/compliance`: Generate regulatory compliance audit evaluation.
-- `GET /api/v1/health`: API health & provider status check.
-
-#### Example API Request:
-```bash
-curl -X POST http://localhost:8000/api/v1/lookup \
-     -H "Content-Type: application/json" \
-     -d '{"ioc": "185.220.101.45"}'
-```
-
----
-
-## 🐳 Container & Kubernetes Deployment
-
-```bash
-# Docker Compose 1-Click Launch
-docker-compose up -d
-
-# Kubernetes Production Deployment
-kubectl apply -f k8s/deployment.yaml
-```
-
----
-
 ## 🐍 Python SDK Integration
 
 ```python
-from soc_toolkit import SOCToolkitSDK, ComplianceEngine, IOCType, ThreatLevel
+from soc_toolkit import SOCToolkitSDK, AIThreatAnalyst, SOAREngine, ActiveDefenseEngine, IOCType, ThreatLevel
 
 sdk = SOCToolkitSDK()
 
-# Perform Threat Analysis & Compliance Evaluation
-result = sdk.analyze("185.220.101.45")
-audit = ComplianceEngine.evaluate_compliance("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
+# Perform AI Triage
+ai_report = AIThreatAnalyst.analyze_threat("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
+print("Kill Chain Phase:", ai_report["cyber_kill_chain_phase"])
 
-print("Compliance Status:", audit["overall_compliance_status"])
-print("PCI-DSS Controls:", audit["pci_dss"])
+# Trigger SOAR Automated Playbook
+soar_res = SOAREngine.execute_workflow("185.220.101.45", "CRITICAL")
+print("Actions Taken:", soar_res["actions_taken"])
 ```
 
 ---

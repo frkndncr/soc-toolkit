@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SOC Toolkit CLI v5.0.0 Ultimate Enterprise - Mandatory Security Platform
+SOC Toolkit CLI v6.0.0 Military & Enterprise Security Suite
 """
 
 import argparse
@@ -10,17 +10,13 @@ from pathlib import Path
 from datetime import datetime
 
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
 from rich.panel import Panel
-from rich import box
 
 from . import __version__
 from .core import SOCToolkit
 from .detectors import IOCDetector, IOCType
-from .formatter import OutputFormatter, THREAT_ICONS, THREAT_COLORS
+from .formatter import OutputFormatter
 from .config import Config
-from .extractor import IOCExtractor, ExtractionResult
 from .playbook import PlaybookGenerator
 from .decoder import PayloadDecoder
 from .rules import DetectionRuleGenerator
@@ -34,6 +30,12 @@ from .siem_queries import SIEMQueryGenerator
 from .graph_visualizer import ThreatGraphVisualizer
 from .compliance import ComplianceEngine
 from .api_server import start_api_server
+from .ai_analyst import AIThreatAnalyst
+from .active_defense import ActiveDefenseEngine
+from .siem_correlator import SIEMCorrelatorEngine
+from .soar import SOAREngine
+from .yara_engine import YARAEngine
+from .shell import start_interactive_shell
 
 
 console = Console()
@@ -44,17 +46,19 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         prog="soc",
-        description="🛡️ Enterprise SOC Toolkit v5.0.0 Ultimate - Mandatory Threat Intel & Incident Platform",
+        description="🛡️ SOC Toolkit v6.0.0 - Autonomous AI Threat Intelligence & Cyber Warfare Suite",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  soc 185.220.101.45                    # IP lookup
+  soc 185.220.101.45                    # IP lookup with AI Root Cause Analysis
+  soc shell                             # Launch Interactive Threat Analyst Terminal Shell
+  soc ai 185.220.101.45                 # Autonomous AI Triage & Cyber Kill Chain Attribution
+  soc soar 185.220.101.45               # Trigger Automated SOAR Workflow Playbook
   soc audit 185.220.101.45               # PCI-DSS & ISO 27001 Compliance Audit
   soc server --port 8000                 # Start Enterprise Production REST API Server
   soc pcap network.pcap                 # Parse PCAP & extract Threat Intel IOCs
   soc analyze sample.exe                # Static PE Malware Analysis & ImpHash
-  soc triage firewall.log                # Perform automated log triage
-  soc web                               # Start local Cyber Web GUI Dashboard
+  soc web                               # Start local 3D Cyber Web GUI Dashboard
 
 Author: Furkan Dinçer (@frkndncr)
 GitHub: https://github.com/frkndncr/soc-toolkit
@@ -63,6 +67,17 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     
     # Subcommands
     subparsers = parser.add_subparsers(dest="subcommand", help="Subcommands")
+
+    # Shell subcommand
+    subparsers.add_parser("shell", help="Launch Interactive Analyst Terminal Shell")
+
+    # AI Triage subcommand
+    ai_parser = subparsers.add_parser("ai", help="Autonomous AI Root Cause Analysis & Kill Chain Attribution")
+    ai_parser.add_argument("ioc", help="IOC to analyze with AI")
+
+    # SOAR subcommand
+    soar_parser = subparsers.add_parser("soar", help="Execute Automated SOAR Workflow Playbook")
+    soar_parser.add_argument("ioc", help="IOC to trigger SOAR actions")
 
     # REST API Server subcommand
     server_parser = subparsers.add_parser("server", help="Start Enterprise Production REST API Server")
@@ -100,7 +115,7 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     refang_parser.add_argument("ioc_str", help="IOC to refang")
 
     # Web subcommand
-    web_parser = subparsers.add_parser("web", help="Start local Cyber Web GUI Dashboard")
+    web_parser = subparsers.add_parser("web", help="Start local 3D Cyber Web GUI Dashboard")
     web_parser.add_argument("--port", type=int, default=8080, help="Web server port (default: 8080)")
 
     # Positional argument
@@ -109,26 +124,13 @@ GitHub: https://github.com/frkndncr/soc-toolkit
     # Input options
     input_group = parser.add_argument_group("Input Options")
     input_group.add_argument("-f", "--file", metavar="FILE", help="File containing IOCs (one per line)")
-    input_group.add_argument("-t", "--type", choices=["ip", "domain", "url", "md5", "sha1", "sha256", "email"], help="Force IOC type")
     
     # Output options
-    output_group = parser.add_argument_group("Output & Export Options")
+    output_group = parser.add_argument_group("Output Options")
     output_group.add_argument("--json", metavar="FILE", help="Export report to JSON file")
-    output_group.add_argument("--md", "--markdown", metavar="FILE", dest="markdown", help="Export report to Markdown file")
-    output_group.add_argument("--csv", metavar="FILE", help="Export report to CSV file")
     output_group.add_argument("--html", metavar="FILE", help="Export interactive HTML report")
     output_group.add_argument("--stix", metavar="FILE", help="Export STIX 2.1 JSON Bundle")
     
-    # SOC Features
-    soc_group = parser.add_argument_group("Enterprise Features")
-    soc_group.add_argument("--compliance", action="action_true" if False else "store_true", help="Generate Compliance Audit Report")
-    soc_group.add_argument("--playbook", action="store_true", help="Generate Incident Response Playbook")
-    soc_group.add_argument("--sigma", action="store_true", help="Generate Sigma SIEM Rule")
-    soc_group.add_argument("--yara", action="store_true", help="Generate YARA Rule")
-    soc_group.add_argument("--siem-queries", action="store_true", help="Generate Splunk/Elastic/Sentinel queries")
-    soc_group.add_argument("--osint", action="store_true", help="Display OSINT investigation links")
-    soc_group.add_argument("--web", action="store_true", help="Start Web GUI Dashboard")
-
     # Display options
     display_group = parser.add_argument_group("Display Options")
     display_group.add_argument("-q", "--quiet", action="store_true", help="Suppress banner")
@@ -144,21 +146,37 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    # Subcommand routing
+    if args.subcommand == "shell":
+        start_interactive_shell()
+        return
+
+    if args.subcommand == "ai":
+        soc = SOCToolkit()
+        report = soc.lookup(args.ioc)
+        ai_res = AIThreatAnalyst.analyze_threat(report.ioc, report.ioc_type, report.overall_threat_level)
+        console.print(Panel(json.dumps(ai_res, indent=2), title="🤖 Autonomous AI Security Analyst Triage", border_style="cyan"))
+        return
+
+    if args.subcommand == "soar":
+        soc = SOCToolkit()
+        report = soc.lookup(args.ioc)
+        soar_res = SOAREngine.execute_workflow(report.ioc, report.overall_threat_level.value)
+        console.print(Panel(json.dumps(soar_res, indent=2), title="🔄 SOAR Automated Workflow Execution", border_style="magenta"))
+        return
+
     if args.subcommand == "server":
         port = getattr(args, "port", 8000)
         start_api_server(port)
         return
 
-    if args.subcommand == "web" or args.web:
+    if args.subcommand == "web" or hasattr(args, 'web') and args.web:
         port = getattr(args, "port", 8080)
         start_web_server(port)
         return
 
-    if args.subcommand == "audit" or args.compliance:
-        target_ioc = args.ioc if hasattr(args, 'ioc') and args.ioc else getattr(args, 'target', '185.220.101.45')
+    if args.subcommand == "audit":
         soc = SOCToolkit()
-        report = soc.lookup(target_ioc)
+        report = soc.lookup(args.ioc)
         comp = ComplianceEngine.evaluate_compliance(report.ioc, report.ioc_type, report.overall_threat_level)
         console.print(Panel(json.dumps(comp, indent=2), title="📜 Regulatory Compliance & Audit Report", border_style="yellow"))
         return
@@ -166,7 +184,7 @@ def main():
     if args.subcommand == "pcap":
         res = PCAPAnalyzer.analyze_pcap(args.file)
         console.print(Panel(
-            f"File: [cyan]{res['filepath']}[/]\nFile Size: {res['file_size_bytes']} bytes\nIOCs Found: {res['total_iocs_found']}\nIPs: {len(res['ips'])}\nDomains: {len(res['domains'])}",
+            f"File: [cyan]{res['filepath']}[/]\nFile Size: {res['file_size_bytes']} bytes\nIOCs Found: {res['total_iocs_found']}",
             title="📦 PCAP Network Forensics Result",
             border_style="cyan"
         ))
@@ -175,7 +193,7 @@ def main():
     if args.subcommand == "analyze":
         res = PEAnalyzer.analyze_file(args.file)
         console.print(Panel(
-            f"File: [cyan]{res['filepath']}[/]\nPE Executable: {res['is_pe_executable']}\nSHA256: {res['sha256']}\nEntropy: {res['entropy']}\nSuspicious APIs: {', '.join(res['suspicious_apis_detected']) if res['suspicious_apis_detected'] else 'None'}",
+            f"File: [cyan]{res['filepath']}[/]\nSHA256: {res['sha256']}\nEntropy: {res['entropy']}",
             title="🔬 Malware Static Analysis Result",
             border_style="magenta"
         ))
@@ -183,25 +201,18 @@ def main():
 
     if args.subcommand == "c2-decode":
         res = C2ConfigExtractor.extract_c2_config(args.text)
-        if res["has_c2_indicators"]:
-            console.print(Panel(json.dumps(res["findings"], indent=2), title="🎯 C2 Beacon Config Extracted", border_style="red"))
-        else:
-            console.print("[yellow]No known C2 beacon signatures matched.[/]")
+        console.print(Panel(json.dumps(res["findings"], indent=2), title="🎯 C2 Beacon Config Extracted", border_style="red"))
         return
 
     if args.subcommand == "triage":
         engine = LogTriageEngine()
         result = engine.triage_file(args.file)
         console.print(f"[bold cyan]🪵 Log Triage Completed for:[/] {args.file}")
-        console.print(f"📊 Total IOCs Extracted: [bold]{result['total_iocs_extracted']}[/]")
-        console.print(f"🔴 Critical Threats Found: [bold red]{result['critical_threats_count']}[/]\n")
         return
 
     if args.subcommand == "decode":
         res = PayloadDecoder.decode_powershell(args.text)
-        if res["found"]:
-            for payload in res["payloads"]:
-                console.print(f"[bold green]🔓 Decoded Payload:[/]\n{payload.get('decoded')}")
+        console.print(f"[bold green]🔓 Decoded Payload:[/]\n{res}")
         return
 
     if args.subcommand == "defang":
@@ -224,10 +235,7 @@ def main():
 
     if args.ioc:
         report = soc.lookup(args.ioc)
-        if args.raw:
-            print(json.dumps(report.__dict__, default=str, indent=2))
-            return
-        formatter.print_report(report, show_playbook=args.playbook, show_osint=args.osint)
+        formatter.print_report(report)
         return
 
     parser.print_help()

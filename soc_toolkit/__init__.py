@@ -1,8 +1,8 @@
 """
-Enterprise SOC Toolkit v5.0.0 Ultimate - Mandatory Enterprise Security Platform
+SOC Toolkit v6.0.0 Military & Enterprise Cyber Security Suite
 """
 
-__version__ = "5.0.0"
+__version__ = "6.0.0"
 __author__ = "Furkan Dinçer"
 __email__ = "frkndncr@github.com"
 __url__ = "https://github.com/frkndncr/soc-toolkit"
@@ -32,6 +32,13 @@ from .compliance import ComplianceEngine
 from .api_server import start_api_server
 from .taxii_server import TAXIIServerEngine
 from .siem_integrations import SIEMIntegrations
+from .ai_analyst import AIThreatAnalyst
+from .active_defense import ActiveDefenseEngine
+from .siem_correlator import SIEMCorrelatorEngine
+from .soar import SOAREngine
+from .yara_engine import YARAEngine
+from .dashboard import DashboardEngine
+from .shell import start_interactive_shell
 
 __all__ = [
     "SOCToolkit",
@@ -69,5 +76,12 @@ __all__ = [
     "start_api_server",
     "TAXIIServerEngine",
     "SIEMIntegrations",
+    "AIThreatAnalyst",
+    "ActiveDefenseEngine",
+    "SIEMCorrelatorEngine",
+    "SOAREngine",
+    "YARAEngine",
+    "DashboardEngine",
+    "start_interactive_shell",
     "__version__"
 ]
