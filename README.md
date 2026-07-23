@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit v6.0.0 Military & Enterprise Security Suite
+# 🛡️ SOC Toolkit v6.0
 
-```
+```text
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
 ██╔════╝██╔═══██╗██╔════╝    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██║ ██╔╝██║╚══██╔══╝
 ███████╗██║   ██║██║            ██║   ██║   ██║██║   ██║██║     █████╔╝ ██║   ██║   
@@ -11,89 +11,116 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### Autonomous AI Threat Intelligence, Active Defense, SIEM Correlation & SOAR Platform
+### ⚡ Autonomous AI Threat Intelligence & Incident Response Platform
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Providers](https://img.shields.io/badge/providers-35+-orange.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-6.0.0--suite-blue.svg)](#)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
-[![Kubernetes](https://img.shields.io/badge/k8s-ready-326ce5.svg)](k8s/deployment.yaml)
-[![CI Status](https://github.com/frkndncr/soc-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/frkndncr/soc-toolkit/actions)
-
-**🤖 Autonomous AI Analyst | ⚡ Active Deception | 🔄 SOAR Playbooks | 📜 Compliance Engine | 🕸️ 3D Threat Map**
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-6.0.0-blue?style=for-the-badge)](#)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](Dockerfile)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](k8s/deployment.yaml)
 
 </div>
 
 ---
 
-## ⭐ Why SOC Toolkit v6.0.0 is the Ultimate Cyber Warfare Platform
-
-**SOC Toolkit v6.0.0** combines Threat Intelligence, AI Root Cause Analysis, Active Defense Deception, SIEM Event Correlation, and SOAR Playbook Execution into a single, unified cyber security platform:
-
-- 🤖 **Autonomous AI Security Analyst (`soc ai <ioc>`)**: Generates Root Cause Analysis (RCA), Cyber Kill Chain Phase Attribution (Recon -> Delivery -> Exploitation -> C2 -> Exfiltration), and CISO Triage Summaries.
-- ⚡ **Active Defense & HoneyTokens (`ActiveDefenseEngine`)**: Deploys Canary URLs, decoy AWS keys, and executes active OS firewall banning (`netsh`, `iptables`, `nftables`, `pfctl`, Fortinet/Palo Alto APIs).
-- 💻 **Interactive Terminal Analyst Shell (`soc shell`)**: Interactive threat hunting shell console with live telemetry feeds and continuous prompt mode.
-- 🔄 **Built-in SOAR Automation Engine (`soc soar <ioc>`)**: Executes automated action workflows (isolate endpoint, generate firewall drop rules, alert SIEM bus).
-- 📜 **Regulatory Compliance Audit (`soc audit <ioc>`)**: Maps findings to **PCI-DSS 4.0**, **ISO/IEC 27001:2022**, **SOC 2 Type II**, and **NIST CSF 2.0**.
-- ⚡ **Production REST API Backend (`soc server --port 8000`)**: JSON API backend supporting API key auth and CORS headers.
-- 🕸️ **3D Cyber Threat Map Dashboard (`soc web --port 8080`)**: Live WebGL cyber threat map with attack vectors and threat gauges.
-- 📦 **PCAP Packet Forensics & PE Malware Analysis**: Native network capture inspection and binary ImpHash / entropy analysis.
-
----
-
-## 🚀 Quick Start
+## ⚡ Quick Start
 
 ```bash
-# Install package
+# 1. Install via pip
 pip install soc-toolkit
 
-# Launch Interactive Analyst Terminal Shell
+# 2. Perform instant Threat Intel Lookup with AI Triage
+soc 185.220.101.45
+
+# 3. Launch Interactive Analyst Terminal Shell
 soc shell
 
-# Autonomous AI Security Analyst Triage
-soc ai 185.220.101.45
-
-# Trigger SOAR Automated Action Workflow
-soc soar 185.220.101.45
-
-# Run PCI-DSS & ISO 27001 Compliance Audit
-soc audit 185.220.101.45
-
-# Start Production Enterprise REST API Server
+# 4. Start Enterprise REST API Server
 soc server --port 8000
 
-# Start 3D Cyber Threat Dashboard
+# 5. Launch 3D Cyber Threat Warfare Dashboard
 soc web --port 8080
-
-# Analyze PCAP Packet Capture
-soc pcap network.pcap
-
-# Static PE Binary Analysis
-soc analyze malware.exe
 ```
 
 ---
 
-## 🐍 Python SDK Integration
+## 🔥 Features at a Glance
+
+| Feature | Description | Command |
+| :--- | :--- | :--- |
+| **🤖 Autonomous AI Analyst** | Root Cause Analysis (RCA) & Cyber Kill Chain Attribution | `soc ai <ioc>` |
+| **🔄 Automated SOAR Engine** | Executes containment, host isolation & firewall bans | `soc soar <ioc>` |
+| **📜 Compliance Audit** | Maps findings to **PCI-DSS 4.0**, **ISO 27001**, **SOC 2** & **NIST CSF** | `soc audit <ioc>` |
+| **⚡ Production REST API** | Multi-tenant JSON REST API backend with key auth & CORS | `soc server --port 8000` |
+| **📡 STIX / TAXII 2.1** | TAXII 2.1 feed server for Palo Alto, Fortinet & EDRs | `soc taxii-server` |
+| **📦 PCAP Forensics** | Native network packet capture parser & IOC extractor | `soc pcap capture.pcap` |
+| **🔬 Static PE Malware Analysis**| ImpHash calculator, section entropy & suspicious API detection | `soc analyze sample.exe` |
+| **🔓 Payload Decoder** | Defang/Refang URLs & Base64 PowerShell command decoder | `soc decode "<cmd>"` |
+| **🕸️ 3D Threat Dashboard** | High-tech WebGL cyber warfare threat map | `soc web --port 8080` |
+
+---
+
+## 🤖 Autonomous AI Security Analyst
+
+Run instant AI triage on any IP, Domain, Hash, or URL:
+
+```bash
+soc ai 185.220.101.45
+```
+
+```json
+{
+  "ioc": "185.220.101.45",
+  "threat_level": "CRITICAL",
+  "cyber_kill_chain_phase": "Command and Control (C2) / Exfiltration",
+  "root_cause_analysis": "Autonomous AI Analysis concluded an overall risk score of CRITICAL. Attribution indicates active alignment with Cyber Kill Chain phase: 'Command and Control (C2)'. Network containment recommended.",
+  "ciso_executive_summary": "EXECUTIVE SUMMARY: Indicator 185.220.101.45 poses a CRITICAL risk to enterprise operations. Authorize automated SOAR containment."
+}
+```
+
+---
+
+## 📜 Regulatory Compliance Frameworks Supported
+
+| Framework | Controls Mapped | Command |
+| :--- | :--- | :--- |
+| **PCI-DSS 4.0** | Req 6.4 (App Security), Req 10.4 (Audit Telemetry), Req 11.4 (Threat Defense) | `soc audit <ioc>` |
+| **ISO/IEC 27001:2022** | Control A.8.7 (Malware Defense), A.8.16 (Monitoring), A.8.23 (Web Filtering) | `soc audit <ioc>` |
+| **SOC 2 Type II** | CC6.1 (Access Controls), CC6.8 (Threat Detection), CC7.2 (Incident Response) | `soc audit <ioc>` |
+| **NIST CSF 2.0** | DE.CM-01 (Continuous Monitoring), RS.AN-01 (Incident Analysis) | `soc audit <ioc>` |
+
+---
+
+## 🐳 1-Click Container Deployment
+
+```bash
+# Docker Compose 1-Click Launch
+docker-compose up -d
+
+# Kubernetes Production Deployment
+kubectl apply -f k8s/deployment.yaml
+```
+
+---
+
+## 🐍 Python SDK
 
 ```python
-from soc_toolkit import SOCToolkitSDK, AIThreatAnalyst, SOAREngine, ActiveDefenseEngine, IOCType, ThreatLevel
+from soc_toolkit import SOCToolkitSDK, AIThreatAnalyst, SOAREngine, IOCType, ThreatLevel
 
 sdk = SOCToolkitSDK()
 
-# Perform AI Triage
-ai_report = AIThreatAnalyst.analyze_threat("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
-print("Kill Chain Phase:", ai_report["cyber_kill_chain_phase"])
+# Analyze IOC
+report = sdk.analyze("185.220.101.45")
 
-# Trigger SOAR Automated Playbook
-soar_res = SOAREngine.execute_workflow("185.220.101.45", "CRITICAL")
-print("Actions Taken:", soar_res["actions_taken"])
+# Autonomous AI Triage
+ai_triage = AIThreatAnalyst.analyze_threat("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
+print("Kill Chain Phase:", ai_triage["cyber_kill_chain_phase"])
 ```
 
 ---
 
-## 📜 License & Author
+## 👤 Author & License
 
 - **Author**: Furkan Dinçer ([@frkndncr](https://github.com/frkndncr))
-- **License**: MIT License
+- **License**: [MIT License](LICENSE)
