@@ -7,7 +7,7 @@ name = "soc-toolkit"
 version = "6.0.0"
 description = "🛡️ SOC Toolkit v6.0 Autonomous AI Cyber Security Suite - AI Triage | Active Defense | SIEM Correlator | SOAR Engine"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.8"
 authors = [
     {name = "Furkan Dinçer", email = "frkndncr@github.com"}
@@ -32,7 +32,6 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
