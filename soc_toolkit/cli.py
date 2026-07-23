@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SOC Toolkit CLI Enterprise SOC Operations Suite
+SOC Toolkit CLI Enterprise & Global SOC Platform
 """
 
 import argparse
@@ -56,6 +56,11 @@ from .enterprise_auth import EnterpriseRBACEngine, SOCRole
 from .edr_collector import EDRCollectorEngine
 from .timeline import IncidentTimelineEngine
 from .cluster import HAClusterEngine
+from .asm import AttackSurfaceScanner
+from .ransomware_checker import RansomwareCheckerEngine
+from .beaconing import BeaconingCalculator
+from .i18n import GlobalI18nEngine
+from .converter import SIEMConverterEngine
 
 
 console = Console(legacy_windows=False)
@@ -64,7 +69,8 @@ SUBCOMMANDS = {
     "shell", "ai", "soar", "server", "audit", "pcap",
     "analyze", "c2-decode", "triage", "decode", "defang", "refang", "web",
     "report", "mem", "mitre-matrix", "vault", "stream",
-    "edr", "timeline", "cluster", "rbac"
+    "edr", "timeline", "cluster", "rbac",
+    "asm", "ransomware", "beacon", "i18n", "convert"
 }
 
 
@@ -73,15 +79,15 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         prog="soc",
-        description="🛡️ SOC Toolkit - Enterprise Multi-Tenant SOC Suite",
+        description="🛡️ SOC Toolkit - Global Enterprise Security Operations Platform",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   soc 185.220.101.45                    # IP lookup
-  soc edr HOST-WORKSTATION-01           # Fetch EDR telemetry & process tree
-  soc timeline 185.220.101.45           # Incident event timeline
-  soc cluster                           # HA Multi-Node Cluster Status
-  soc rbac analyst_john                 # Generate JWT token with RBAC role
+  soc asm enterprise.com                # Attack Surface Discovery & Shadow IT
+  soc ransomware 185.220.101.45         # Ransomware Gang TTP Matcher (LockBit, ALPHV)
+  soc convert "EventID 4625 failed..."   # Auto-convert log snippet to Sigma/YARA rules
+  soc i18n 185.220.101.45 de            # German Executive Security Report
 
 Author: Furkan Dinçer (@frkndncr)
 GitHub: https://github.com/frkndncr/soc-toolkit
@@ -125,6 +131,39 @@ def main():
     args = parser.parse_args()
 
     cmd = args.ioc
+
+    if cmd == "asm":
+        target = args.subarg or "example.com"
+        res = AttackSurfaceScanner.scan_domain(target)
+        console.print(Panel(json.dumps(res, indent=2), title="🌐 External Attack Surface & Shadow IT Scan", border_style="cyan"))
+        return
+
+    if cmd == "ransomware":
+        target = args.subarg or "185.220.101.45"
+        soc = SOCToolkit()
+        report = soc.lookup(target)
+        res = RansomwareCheckerEngine.evaluate_ioc(report.ioc, report.overall_threat_level)
+        console.print(Panel(json.dumps(res, indent=2), title="💀 Ransomware Gang TTP Matcher (LockBit / ALPHV)", border_style="red"))
+        return
+
+    if cmd == "beacon":
+        timestamps = [100.0, 160.0, 220.0, 280.0, 340.0]
+        res = BeaconingCalculator.calculate_beaconing(timestamps)
+        console.print(Panel(json.dumps(res, indent=2), title="⏱️ C2 Network Beaconing & Jitter Calculator", border_style="yellow"))
+        return
+
+    if cmd == "i18n":
+        target = args.subarg or "185.220.101.45"
+        lang = args.extra_arg or "de"
+        res = GlobalI18nEngine.format_report(target, "CRITICAL", lang)
+        console.print(Panel(json.dumps(res, indent=2), title=f"🗣️ Multi-Language Security Report ({lang.upper()})", border_style="green"))
+        return
+
+    if cmd == "convert":
+        log_text = args.subarg or "Failed login from 185.220.101.45 on port 22"
+        res = SIEMConverterEngine.convert_log_to_rules(log_text)
+        console.print(Panel(json.dumps(res, indent=2), title="🔄 SIEM Log-to-Sigma & YARA Rule Converter", border_style="magenta"))
+        return
 
     if cmd == "edr":
         target = args.subarg or "HOST-SEC-01"

@@ -1,5 +1,5 @@
 """
-SOC Toolkit Enterprise Multi-Tenant Security Suite
+SOC Toolkit Global Enterprise Platform
 """
 
 __version__ = "6.0.0"
@@ -48,6 +48,11 @@ from .enterprise_auth import EnterpriseRBACEngine, SOCRole
 from .edr_collector import EDRCollectorEngine
 from .timeline import IncidentTimelineEngine
 from .cluster import HAClusterEngine
+from .asm import AttackSurfaceScanner
+from .ransomware_checker import RansomwareCheckerEngine
+from .beaconing import BeaconingCalculator
+from .i18n import GlobalI18nEngine
+from .converter import SIEMConverterEngine
 
 __all__ = [
     "SOCToolkit",
@@ -102,5 +107,10 @@ __all__ = [
     "EDRCollectorEngine",
     "IncidentTimelineEngine",
     "HAClusterEngine",
+    "AttackSurfaceScanner",
+    "RansomwareCheckerEngine",
+    "BeaconingCalculator",
+    "GlobalI18nEngine",
+    "SIEMConverterEngine",
     "__version__"
 ]

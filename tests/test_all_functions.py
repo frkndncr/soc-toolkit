@@ -260,6 +260,14 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         test_incident_timeline()
         test_ha_cluster()
 
+    def test_24_global_features(self):
+        from test_global import test_asm_scanner, test_ransomware_checker, test_beaconing_calculator, test_global_i18n, test_siem_converter
+        test_asm_scanner()
+        test_ransomware_checker()
+        test_beaconing_calculator()
+        test_global_i18n()
+        test_siem_converter()
+
 
 if __name__ == "__main__":
     unittest.main()
