@@ -1,8 +1,8 @@
 """
-Enterprise SOC Toolkit v3.0.0 - Threat Intelligence & Incident Response Workbench
+Enterprise SOC Toolkit v4.0.0 NextGen - Threat Hunting, Forensics & Malware Analysis Platform
 """
 
-__version__ = "3.0.0"
+__version__ = "4.0.0"
 __author__ = "Furkan Dinçer"
 __email__ = "frkndncr@github.com"
 __url__ = "https://github.com/frkndncr/soc-toolkit"
@@ -22,6 +22,12 @@ from .triage import LogTriageEngine
 from .rules import DetectionRuleGenerator
 from .sdk import SOCToolkitSDK
 from .osint import OSINTLinksGenerator
+from .pcap_analyzer import PCAPAnalyzer
+from .pe_analyzer import PEAnalyzer
+from .c2_extractor import C2ConfigExtractor
+from .mitre_navigator import MITRENavigatorExporter
+from .siem_queries import SIEMQueryGenerator
+from .graph_visualizer import ThreatGraphVisualizer
 
 __all__ = [
     "SOCToolkit",
@@ -49,5 +55,11 @@ __all__ = [
     "LogTriageEngine",
     "DetectionRuleGenerator",
     "OSINTLinksGenerator",
+    "PCAPAnalyzer",
+    "PEAnalyzer",
+    "C2ConfigExtractor",
+    "MITRENavigatorExporter",
+    "SIEMQueryGenerator",
+    "ThreatGraphVisualizer",
     "__version__"
 ]

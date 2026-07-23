@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit v3.0.0 Enterprise
+# 🛡️ Enterprise SOC Toolkit v4.0.0 NextGen
 
 ```
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -11,31 +11,31 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### Enterprise SOC Analyst Workbench - Threat Intelligence, Incident Response Playbooks & Log Triage
+### World-Class Cyber Threat Hunting, Malware Analysis & Network Forensics Platform
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Providers](https://img.shields.io/badge/providers-35+-orange.svg)](#-providers)
-[![Version](https://img.shields.io/badge/version-3.0.0--enterprise-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-4.0.0--nextgen-blue.svg)](#)
 [![CI Status](https://github.com/frkndncr/soc-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/frkndncr/soc-toolkit/actions)
 
-**🔍 35+ Threat Intel Sources | 🛡️ IR Playbooks | 🌐 Cyber Web GUI | 🪵 Log Triage | 🔓 Payload Decoder | 📜 YARA/Sigma Rules**
+**🔍 35+ TI Sources | 📦 PCAP Forensics | 🔬 PE Malware Analysis | 🎯 C2 Beacon Decoder | 🔍 Multi-SIEM Query Gen | 🗺️ MITRE Navigator**
 
 </div>
 
 ---
 
-## ⭐ Why Enterprise SOC Toolkit v3.0.0?
+## ⭐ Why SOC Toolkit v4.0.0 NextGen?
 
-Standard threat intelligence tools often generate alert fatigue and lack actionable incident response steps. **SOC Toolkit v3.0.0** is built for real-world SOC operations:
+**SOC Toolkit v4.0.0** elevates threat intelligence into a full-spectrum Cyber Threat Hunting and Malware Analysis platform:
 
-- 🛡️ **Incident Response Playbook Generator**: Step-by-step containment (`iptables` / endpoint isolation), eradication, and recovery guidelines for every alert.
-- 🟢 **False Positive & Cloud Infrastructure Filter**: Automatically detects Google DNS, Cloudflare, Akamai, and AWS infrastructure to eliminate false alarms.
-- 🌐 **Interactive Cyber Web GUI (`soc web`)**: Zero-dependency dark-mode dashboard for web-based triage.
-- 🪵 **Automated Log & Forensics Triage (`soc triage file.log`)**: Scans log dumps, refangs IOCs, ranks critical threats, and outputs executive threat summaries.
-- 🔓 **PowerShell & Defang Decoder (`soc decode`)**: Instantly decodes `powershell -enc` base64 payloads and defanged URLs (`hXXps://`).
-- 📜 **SIEM & NIDS Rule Generation**: Auto-generates Sigma rules, YARA rules, and Snort/Suricata drop statements.
-- 🐍 **Python SDK (`import soc_toolkit`)**: Easily embed into SOAR workflows (Shuffle, DFIR-IRIS, Cortex) or Jupyter Notebooks.
+- 📦 **PCAP Network Packet Forensics (`soc pcap capture.pcap`)**: Parses network captures in pure Python, extracts DNS, HTTP, User-Agents, and cross-references extracted IOCs against 35+ Threat Intel providers.
+- 🔬 **Malware Static & PE Analyzer (`soc analyze sample.exe`)**: Calculates SHA256, MD5, SHA1, ImpHash (Import Hash), section entropy, suspicious API calls (`VirtualAlloc`, `WriteProcessMemory`), and detects packed binaries.
+- 🎯 **C2 Beacon Config Extractor (`soc c2-decode`)**: Decodes Cobalt Strike Malleable C2 configs (Watermark, Public Key, C2 endpoints) and AsyncRAT/Meterpreter configs.
+- 🔍 **Multi-SIEM Search Query Generator (`--siem-queries`)**: Generates instant copy-paste queries for **Splunk SPL**, **Elastic KQL**, **Microsoft Sentinel**, **IBM QRadar AQL**, and **CrowdStrike Falcon**.
+- 🗺️ **MITRE ATT&CK Navigator Layer Exporter (`--mitre-layer`)**: Exports JSON layer heatmaps for [MITRE ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/).
+- 🕸️ **Interactive Threat Graph Visualizer (`--graph`)**: Generates interactive SVG & HTML relationship graphs mapping IOCs to threat sources.
+- 🛡️ **Incident Response Playbooks & False Positive Suppression**: Generates `iptables` containment rules while automatically whitelisting Google DNS, Cloudflare, Akamai, and AWS infrastructure.
 
 ---
 
@@ -45,11 +45,17 @@ Standard threat intelligence tools often generate alert fatigue and lack actiona
 # Install package
 pip install soc-toolkit
 
-# Analyze an IP address
-soc 185.220.101.45
+# Analyze an IP address with SIEM queries & Playbook
+soc 185.220.101.45 --siem-queries --playbook
 
-# Generate Incident Containment Playbook
-soc 185.220.101.45 --playbook
+# Network PCAP Packet Forensics
+soc pcap network.pcap
+
+# Malware Executable Static Analysis & ImpHash
+soc analyze malware.exe
+
+# Extract Cobalt Strike / AsyncRAT C2 Config
+soc c2-decode "watermark=1234567"
 
 # Perform Automated Log Triage
 soc triage firewall.log
@@ -63,87 +69,40 @@ soc web
 
 ---
 
-## 🔌 Threat Intelligence Providers (35+ Total)
+## 🛠️ Advanced CLI Examples
 
-### 🆓 FREE - No API Key Required
-- **Pulsedive**: Risk score & indicator properties
-- **ThreatFox Direct API**: Official abuse.ch C2 & IOC database
-- **URLhaus Direct API**: Official abuse.ch malware URL database
-- **MalwareBazaar Direct API**: Official abuse.ch malware sample hash lookup
-- **Tranco Top 1M Rank**: Popular domain validation to suppress false positives
-- **Shodan InternetDB**: Open ports & CVEs
-- **IP-API**: GeoIP & proxy detection
-- **GreyNoise Community**: Scanner detection
-- **StopForumSpam**: Spam database
-- **URLScan.io**: Web page analysis
-- **IPInfo**: Geolocation
-- **CIRCL Hashlookup**: Known file database
-- **DNSBL**: 6 major DNS blacklists (Spamhaus, SpamCop, SORBS, Barracuda, CBL, UCEProtect)
-- **17 Blocklist Feeds**: EmergingThreats, CINS Army, Blocklist.de, Feodo Tracker, SSLBL, Tor Exit Nodes, Spamhaus DROP, Binary Defense, GreenSnow, IPsum L3+, DShield, BruteForce Blocker, PhishingDB, OpenPhish.
-
-### 🔑 Premium - API Key Supported
-- **VirusTotal**: Multi-engine AV scanning
-- **AbuseIPDB**: IP abuse reports
-- **AlienVault OTX**: Threat pulses
-
----
-
-## 🛠️ CLI Usage & Features
-
-### 1. Single IOC Analysis & Playbook
+### 1. Multi-SIEM Query Generation
 ```bash
-soc 185.220.101.45 --playbook --osint
+soc 185.220.101.45 --siem-queries
+```
+*Outputs instant SPL (Splunk), KQL (Elastic & Sentinel), AQL (QRadar), and CrowdStrike queries.*
+
+### 2. Export MITRE ATT&CK Navigator Heatmap Layer
+```bash
+soc 185.220.101.45 --mitre-layer attack_layer.json
 ```
 
-### 2. Export Formats (HTML & STIX 2.1)
+### 3. Interactive Threat Relationship Graph
 ```bash
-# Interactive HTML Report
-soc 185.220.101.45 --html report.html
-
-# STIX 2.1 JSON Bundle
-soc 185.220.101.45 --stix report.stix.json
-
-# JSON / CSV / Markdown
-soc 185.220.101.45 --json report.json --csv report.csv
-```
-
-### 3. Generate SIEM Detection Rules
-```bash
-# Generate Sigma Rule
-soc 185.220.101.45 --sigma
-
-# Generate YARA Rule
-soc 44d88612fea8a8f36de82e1278abb02f --yara
-```
-
-### 4. Defang / Refang URLs & Obfuscated Command Decoding
-```bash
-# Defang URL
-soc defang "https://evil.com/payload"
-# Output: hXXps://evil[.]com/payload
-
-# Refang URL
-soc refang "hXXps://evil[.]com/payload"
-# Output: https://evil.com/payload
+soc 185.220.101.45 --graph threat_graph.html
 ```
 
 ---
 
 ## 🐍 Python SDK Integration
 
-Embed **SOC Toolkit** into your Python scripts or SOAR pipelines:
-
 ```python
-from soc_toolkit import SOCToolkitSDK
+from soc_toolkit import SOCToolkitSDK, PCAPAnalyzer, PEAnalyzer
 
 sdk = SOCToolkitSDK()
 
-# Perform full threat analysis
+# Threat Analysis
 result = sdk.analyze("185.220.101.45")
+print("SIEM Queries:", result["siem_queries"])
 
-print("Threat Level:", result["threat_level"])
-print("Playbook Containment:", result["playbook"].containment_actions)
-print("Sigma Rule:", result["sigma_rule"])
+# Static Binary Malware Analysis
+pe_info = PEAnalyzer.analyze_file("payload.exe")
+print("ImpHash / Hashes:", pe_info["sha256"], pe_info["entropy"])
 ```
 
 ---

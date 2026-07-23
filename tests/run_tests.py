@@ -9,6 +9,7 @@ from test_whitelist import test_google_dns_whitelist, test_cloudflare_dns_whitel
 from test_playbook import test_critical_ip_playbook, test_clean_domain_playbook
 from test_decoder import test_defang_url, test_refang_url, test_decode_powershell
 from test_sdk import test_sdk_defang_refang, test_sdk_decode
+from test_v4 import test_pe_entropy, test_c2_extraction, test_siem_queries, test_mitre_navigator
 
 class TestSOCToolkit(unittest.TestCase):
     def test_whitelist(self):
@@ -29,6 +30,12 @@ class TestSOCToolkit(unittest.TestCase):
     def test_sdk(self):
         test_sdk_defang_refang()
         test_sdk_decode()
+
+    def test_v4_features(self):
+        test_pe_entropy()
+        test_c2_extraction()
+        test_siem_queries()
+        test_mitre_navigator()
 
 if __name__ == "__main__":
     unittest.main()

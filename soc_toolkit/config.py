@@ -9,9 +9,9 @@ from pathlib import Path
 class Config:
     """Configuration settings"""
     
-    VERSION = "3.0.0"
+    VERSION = "4.0.0"
     TIMEOUT = 15
-    USER_AGENT = "SOC-Toolkit/3.0.0 (https://github.com/frkndncr/soc-toolkit)"
+    USER_AGENT = "SOC-Toolkit/4.0.0 (https://github.com/frkndncr/soc-toolkit)"
     MAX_WORKERS = 10
     
     # API Keys - Free providers (no key needed for basic use)
