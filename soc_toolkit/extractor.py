@@ -136,6 +136,11 @@ class IOCExtractor:
         )
     
     @classmethod
+    def extract(cls, text: str, include_private_ips: bool = False, include_defanged: bool = True):
+        """Alias for extract_from_text"""
+        return cls.extract_from_file_content(text, include_private_ips=include_private_ips, include_defanged=include_defanged) if hasattr(cls, 'extract_from_file_content') else cls.extract_from_text(text, include_private_ips=include_private_ips, include_defanged=include_defanged)
+
+    @classmethod
     def extract_from_text(cls, text: str, 
                           include_private_ips: bool = False,
                           include_defanged: bool = True) -> Dict[str, Set[str]]:

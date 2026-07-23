@@ -16,7 +16,7 @@ class OSINTLinksGenerator:
         type_str = ioc_type.value if hasattr(ioc_type, 'value') else str(ioc_type)
         links = {}
 
-        if type_str in ("ip", "ipv4", "ipv6"):
+        if type_str.lower() in ("ip", "ipv4", "ipv6"):
             links["VirusTotal"] = f"https://www.virustotal.com/gui/ip-address/{ioc}"
             links["AbuseIPDB"] = f"https://www.abuseipdb.com/check/{ioc}"
             links["Shodan"] = f"https://www.shodan.io/host/{ioc}"
@@ -25,7 +25,7 @@ class OSINTLinksGenerator:
             links["GreyNoise"] = f"https://viz.greynoise.io/ip/{ioc}"
             links["AlienVault OTX"] = f"https://otx.alienvault.com/indicator/ip/{ioc}"
 
-        elif type_str in ("domain", "url"):
+        elif type_str.lower() in ("domain", "url"):
             domain = ioc.replace("https://", "").replace("http://", "").split("/")[0]
             links["VirusTotal"] = f"https://www.virustotal.com/gui/domain/{domain}"
             links["URLScan.io"] = f"https://urlscan.io/domain/{domain}"
@@ -34,7 +34,7 @@ class OSINTLinksGenerator:
             links["Any.Run"] = f"https://app.any.run/submissions/#query={quote(domain)}"
             links["CRT.sh"] = f"https://crt.sh/?q={quote(domain)}"
 
-        elif "hash" in type_str:
+        elif type_str.lower() in ("md5", "sha1", "sha256") or "hash" in type_str.lower():
             links["VirusTotal"] = f"https://www.virustotal.com/gui/file/{ioc}"
             links["MalwareBazaar"] = f"https://bazaar.abuse.ch/browse.php?search={ioc}"
             links["Hybrid-Analysis"] = f"https://www.hybrid-analysis.com/search?query={ioc}"

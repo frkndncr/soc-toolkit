@@ -3,6 +3,7 @@ Interactive Threat Graph Visualizer for SOC Toolkit
 Generates interactive node-edge relationship graphs (SVG/HTML) mapping IOCs to threat sources, malware families, and risk scores.
 """
 
+import json
 from typing import Dict, Any, List
 
 

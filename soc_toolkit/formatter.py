@@ -1,5 +1,5 @@
 """
-Output formatting and export for SOC Toolkit v3.0.0
+Output formatting and export for SOC Toolkit v6.0.0
 """
 
 import json
@@ -19,7 +19,6 @@ from .playbook import PlaybookGenerator
 from .osint import OSINTLinksGenerator
 
 
-# Threat level styling
 THREAT_COLORS = {
     ThreatLevel.CLEAN: "green",
     ThreatLevel.LOW: "blue",
@@ -43,8 +42,17 @@ class OutputFormatter:
     """Format and display results"""
     
     def __init__(self):
-        self.console = Console()
+        self.console = Console(legacy_windows=False)
         
+    def _safe_print(self, msg: str):
+        try:
+            self.console.print(msg)
+        except Exception:
+            try:
+                print(msg.encode('ascii', 'ignore').decode('ascii'))
+            except Exception:
+                pass
+
     def print_banner(self):
         """Print tool banner"""
         banner = """
@@ -58,12 +66,11 @@ class OutputFormatter:
 [/]
 [dim]SOC Analyst Workbench v{version} | Enterprise Threat Intelligence & Incident Response[/]
         """.format(version=Config.VERSION)
-        self.console.print(banner)
+        self._safe_print(banner)
         
     def print_report(self, report: IOCReport, show_playbook: bool = False, show_osint: bool = True):
         """Print formatted report to console"""
         
-        # Header panel
         header_text = Text()
         header_text.append("🔍 IOC: ", style="bold")
         header_text.append(f"{report.ioc}\n", style="cyan bold")
@@ -74,14 +81,13 @@ class OutputFormatter:
         header_text.append(f"\n{report.summary}", 
                          style=THREAT_COLORS.get(report.overall_threat_level, "white"))
         
-        self.console.print(Panel(
+        self._safe_print(Panel(
             header_text, 
             title="[bold white]📊 IOC Analysis Report[/]", 
             border_style="cyan", 
             box=box.DOUBLE
         ))
         
-        # Results table
         table = Table(
             title="🔎 Source Results", 
             box=box.ROUNDED, 
@@ -120,24 +126,22 @@ class OutputFormatter:
             time_str = f"{result.response_time:.2f}s" if result.response_time else "-"
             table.add_row(result.source, status, threat_str, details_str, time_str)
             
-        self.console.print(table)
+        self._safe_print(table)
         
-        # OSINT Quick Links
         if show_osint:
             links = OSINTLinksGenerator.get_links(report.ioc, report.ioc_type)
             if links:
-                self.console.print("\n[bold cyan]🔗 OSINT INVESTIGATION LINKS[/]")
+                self._safe_print("\n[bold cyan]🔗 OSINT INVESTIGATION LINKS[/]")
                 for name, url in links.items():
-                    self.console.print(f"  • [bold]{name}:[/] [dim underline]{url}[/]")
+                    self._safe_print(f"  • [bold]{name}:[/] [dim underline]{url}[/]")
 
-        # Playbook output
         if show_playbook or report.overall_threat_level in (ThreatLevel.HIGH, ThreatLevel.CRITICAL):
             playbook = PlaybookGenerator.generate(report.ioc, report.ioc_type, report.overall_threat_level)
-            self.console.print("\n" + Panel(
+            self._safe_print("\n" + str(Panel(
                 playbook.to_markdown(),
                 title="[bold red]🛡️ Incident Response Playbook[/]",
                 border_style="red"
-            ))
+            )))
 
     def export_html(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to single-file interactive HTML report"""
@@ -201,7 +205,7 @@ class OutputFormatter:
 
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(html)
-        self.console.print(f"[green]✅ HTML Report saved: {filepath}[/]")
+        self._safe_print(f"[green]HTML Report saved: {filepath}[/]")
 
     def export_stix(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to STIX 2.1 JSON Bundle"""
@@ -225,7 +229,7 @@ class OutputFormatter:
         }
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(stix_bundle, f, indent=2)
-        self.console.print(f"[green]✅ STIX 2.1 Bundle saved: {filepath}[/]")
+        self._safe_print(f"[green]STIX 2.1 Bundle saved: {filepath}[/]")
 
     def export_json(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to JSON file"""
@@ -243,7 +247,7 @@ class OutputFormatter:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(serialize(report), f, indent=2, ensure_ascii=False)
             
-        self.console.print(f"[green]✅ Report saved: {filepath}[/]")
+        self._safe_print(f"[green]Report saved: {filepath}[/]")
         
     def export_markdown(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to Markdown file"""
@@ -260,7 +264,7 @@ class OutputFormatter:
 """
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(md)
-        self.console.print(f"[green]✅ Markdown report saved: {filepath}[/]")
+        self._safe_print(f"[green]Markdown report saved: {filepath}[/]")
 
     def export_csv(self, report: IOCReport, filepath: Union[str, Path]):
         """Export report to CSV file"""
@@ -277,4 +281,4 @@ class OutputFormatter:
                     result.threat_level.value,
                     f"{result.response_time:.2f}"
                 ])
-        self.console.print(f"[green]✅ CSV report saved: {filepath}[/]")
+        self._safe_print(f"[green]CSV report saved: {filepath}[/]")

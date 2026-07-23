@@ -4,8 +4,7 @@ Parses packet captures in pure Python, extracts HTTP URLs, DNS queries, TLS SNIs
 and cross-references them against Threat Intelligence sources.
 """
 
-import struct
-import socket
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Set
 from .extractor import IOCExtractor
@@ -26,20 +25,16 @@ class PCAPAnalyzer:
         with open(path, 'rb') as f:
             content = f.read()
 
-        extracted_iocs = set()
         dns_queries = set()
         http_hosts = set()
         user_agents = set()
 
-        # Regex fallback on raw bytes for maximum compatibility across PCAP/PCAPNG formats
         text_content = content.decode('latin-1', errors='ignore')
         
         # Extract all IPs, Domains, URLs, Hashes using IOCExtractor
-        extracted = IOCExtractor.extract(text_content)
-        all_iocs = extracted.get_all_iocs()
+        extracted_dict = IOCExtractor.extract(text_content)
+        all_iocs = [ioc for s in extracted_dict.values() for ioc in s]
 
-        # Simple packet byte inspection for DNS queries and HTTP Host headers
-        import re
         dns_matches = re.findall(r'[\x01-\x3f]([a-zA-Z0-9-]{2,63}\.[a-zA-Z0-9-]{2,63}(?:\.[a-zA-Z]{2,})?)', text_content)
         for d in dns_matches:
             if '.' in d and not d.endswith('.arpa'):
@@ -57,9 +52,9 @@ class PCAPAnalyzer:
             "filepath": filepath,
             "file_size_bytes": len(content),
             "total_iocs_found": len(all_iocs),
-            "ips": extracted.ips,
-            "domains": list(set(extracted.domains).union(dns_queries)),
-            "urls": extracted.urls,
+            "ips": list(extracted_dict.get('ip', set())),
+            "domains": list(set(extracted_dict.get('domain', set())).union(dns_queries)),
+            "urls": list(extracted_dict.get('url', set())),
             "http_hosts": list(http_hosts),
             "user_agents": list(user_agents)[:10],
             "dns_queries": list(dns_queries)[:20]

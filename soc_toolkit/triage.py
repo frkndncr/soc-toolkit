@@ -31,8 +31,8 @@ class LogTriageEngine:
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
 
-        extraction = IOCExtractor.extract(content)
-        all_iocs = extraction.get_all_iocs()
+        extraction_dict = IOCExtractor.extract(content)
+        all_iocs = [ioc for s in extraction_dict.values() for ioc in s]
 
         if not all_iocs:
             return {
@@ -44,7 +44,6 @@ class LogTriageEngine:
                 "reports": []
             }
 
-        # Limit to max_iocs for fast triage
         target_iocs = all_iocs[:max_iocs]
         reports = []
         critical_reports = []
@@ -55,7 +54,6 @@ class LogTriageEngine:
             if report.overall_threat_level in (ThreatLevel.HIGH, ThreatLevel.CRITICAL):
                 critical_reports.append(report)
 
-        # Sort critical reports by threat level (Critical first, then High)
         critical_reports.sort(
             key=lambda r: 0 if r.overall_threat_level == ThreatLevel.CRITICAL else 1
         )
