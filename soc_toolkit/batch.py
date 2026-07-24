@@ -34,8 +34,12 @@ class BatchScanner:
                 "results": []
             }
 
-        extracted = IOCExtractor.extract_all(content)
-        all_iocs = list(set(extracted.get("ips", []) + extracted.get("domains", []) + extracted.get("hashes", []) + extracted.get("urls", [])))
+        extracted = IOCExtractor.extract_from_text(content, include_private_ips=True)
+        ips = list(extracted.get("ip", set()))
+        domains = list(extracted.get("domain", set()))
+        hashes = list(extracted.get("md5", set()) | extracted.get("sha1", set()) | extracted.get("sha256", set()))
+        urls = list(extracted.get("url", set()))
+        all_iocs = list(set(ips + domains + hashes + urls))
 
         if not all_iocs:
             return {
