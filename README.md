@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit v6.0
+# 🛡️ SOC Toolkit v7.0
 
 ```text
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -11,11 +11,11 @@
 ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
 ```
 
-### ⚡ Autonomous AI Threat Intelligence & Incident Response Platform
+### ⚡ Global Enterprise Threat Intelligence & Incident Response Platform
 
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-6.0.0-blue?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-7.0.0-blue?style=for-the-badge)](#)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](Dockerfile)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](k8s/deployment.yaml)
 
@@ -29,7 +29,7 @@
 # 1. Install via pip
 pip install soc-toolkit
 
-# 2. Perform instant Threat Intel Lookup with AI Triage
+# 2. Perform instant Zero-Key Threat Intel Lookup with AI Triage
 soc 185.220.101.45
 
 # 3. Launch Interactive Analyst Terminal Shell
@@ -48,14 +48,18 @@ soc web --port 8080
 
 | Feature | Description | Command |
 | :--- | :--- | :--- |
+| **🦠 Zero-Key VirusTotal / Shodan / AbuseIPDB** | API Key-Free public VirusTotal, Shodan (CVEs & Risk Grade A-F), AbuseIPDB & Cisco Talos | `soc <ioc>` |
 | **🤖 Autonomous AI Analyst** | Root Cause Analysis (RCA) & Cyber Kill Chain Attribution | `soc ai <ioc>` |
+| **📡 Live Syslog Stream** | Real-time UDP 514 Syslog listener with Slack/Teams Webhook alerts | `soc stream` |
+| **🧬 Memory & Mimikatz Forensics** | Process memory dump parser & LSASS credential theft hunter | `soc mem <file>` |
+| **🔌 Enterprise EDR Collector** | CrowdStrike Falcon, Defender & SentinelOne process tree telemetry | `soc edr <host>` |
+| **🌐 Attack Surface Management (EASM)** | Subdomain discovery, open ports, HSTS/CSP security headers & Shadow IT | `soc asm <domain>` |
+| **💀 Ransomware Gang Matcher** | LockBit 3.0, BlackCat/ALPHV, Clop & RansomHub TTP matching | `soc ransomware <ioc>` |
+| **📄 Executive Incident Tickets** | 1-Click Jira & ServiceNow Incident Response ticket generator | `soc report <ioc>` |
+| **⏱️ C2 Beaconing Calculator** | Connection interval delta variance & heartbeat detection | `soc beacon` |
+| **🗣️ Multi-Language Reports** | Generates reports in English, Turkish, German, French, Spanish & Japanese | `soc i18n <ioc> de` |
 | **🔄 Automated SOAR Engine** | Executes containment, host isolation & firewall bans | `soc soar <ioc>` |
-| **📜 Compliance Audit** | Maps findings to **PCI-DSS 4.0**, **ISO 27001**, **SOC 2** & **NIST CSF** | `soc audit <ioc>` |
-| **⚡ Production REST API** | Multi-tenant JSON REST API backend with key auth & CORS | `soc server --port 8000` |
-| **📡 STIX / TAXII 2.1** | TAXII 2.1 feed server for Palo Alto, Fortinet & EDRs | `soc taxii-server` |
-| **📦 PCAP Forensics** | Native network packet capture parser & IOC extractor | `soc pcap capture.pcap` |
-| **🔬 Static PE Malware Analysis**| ImpHash calculator, section entropy & suspicious API detection | `soc analyze sample.exe` |
-| **🔓 Payload Decoder** | Defang/Refang URLs & Base64 PowerShell command decoder | `soc decode "<cmd>"` |
+| **📜 Regulatory Compliance** | Maps findings to **PCI-DSS 4.0**, **ISO 27001**, **SOC 2** & **NIST CSF** | `soc audit <ioc>` |
 | **🕸️ 3D Threat Dashboard** | High-tech WebGL cyber warfare threat map | `soc web --port 8080` |
 
 ---
