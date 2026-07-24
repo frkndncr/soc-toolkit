@@ -61,6 +61,8 @@ from .ransomware_checker import RansomwareCheckerEngine
 from .beaconing import BeaconingCalculator
 from .i18n import GlobalI18nEngine
 from .converter import SIEMConverterEngine
+from .batch import BatchScanner
+from .whitelist import WhitelistFilter
 
 
 console = Console(legacy_windows=False)
@@ -68,9 +70,10 @@ console = Console(legacy_windows=False)
 SUBCOMMANDS = {
     "shell", "ai", "soar", "server", "audit", "pcap",
     "analyze", "c2-decode", "triage", "decode", "defang", "refang", "web",
-    "report", "mem", "mitre-matrix", "vault", "stream",
+    "report", "mem", "mitre-matrix", "mitre", "vault", "stream",
     "edr", "timeline", "cluster", "rbac",
-    "asm", "ransomware", "beacon", "i18n", "convert"
+    "asm", "ransomware", "beacon", "i18n", "convert",
+    "batch", "whitelist"
 }
 
 
@@ -222,12 +225,23 @@ def main():
         console.print(Panel(json.dumps(res, indent=2), title="🧬 Process Memory & Mimikatz Forensics", border_style="red"))
         return
 
-    if cmd == "mitre-matrix":
-        target = args.subarg or "8.8.8.8"
+    if cmd == "batch":
+        target_file = args.subarg or ""
+        res = BatchScanner.scan_file(target_file)
+        console.print(Panel(json.dumps(res, indent=2), title="📁 Toplu Dosya / Log IOC Tarama Sonucu", border_style="cyan"))
+        return
+
+    if cmd == "whitelist":
+        target = args.subarg or "10.0.0.1"
+        res = WhitelistFilter.evaluate(target, "ip")
+        console.print(Panel(json.dumps(res, indent=2), title=f"🟢 Whitelist & Yanlış Alarm Filtresi ({target})", border_style="green"))
+        return
+
+    if cmd in ("mitre", "mitre-matrix"):
+        target = args.subarg or "185.220.101.45"
         soc = SOCToolkit()
         report = soc.lookup(target)
-        matrix = MITREMatrixEngine.generate_matrix(report.ioc, report.ioc_type, report.overall_threat_level)
-        console.print(Panel(json.dumps(matrix, indent=2), title="🗺️ 14-Tactic MITRE ATT&CK Matrix Heatmap", border_style="cyan"))
+        MITREMatrixEngine.print_visual_matrix(report.ioc, report.ioc_type, report.overall_threat_level)
         return
 
     if cmd == "vault":

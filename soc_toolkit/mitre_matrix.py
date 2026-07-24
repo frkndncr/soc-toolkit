@@ -44,3 +44,32 @@ class MITREMatrixEngine:
             "active_tactics_count": active_count,
             "mitre_matrix": matrix
         }
+
+    @classmethod
+    def print_visual_matrix(cls, ioc: str, ioc_type: IOCType, threat_level: ThreatLevel):
+        """Render Rich Visual ATT&CK Heatmap Grid"""
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+
+        data = cls.generate_matrix(ioc, ioc_type, threat_level)
+        console = Console()
+
+        table = Table(title=f"🗺️ MITRE ATT&CK Matrix Heatmap for {ioc} ({data['threat_level']})", border_style="cyan", show_header=True)
+        table.add_column("Tactic", style="bold yellow")
+        table.add_column("Status", justify="center")
+        table.add_column("Technique ID", style="cyan")
+        table.add_column("Technique Name", style="white")
+
+        for tactic, details in data["mitre_matrix"].items():
+            if details["active"]:
+                status = "[bold red]🔴 ACTIVE TTP[/]"
+                tech_id = f"[bold]{details['technique_id']}[/]"
+                tech_name = details['technique_name']
+            else:
+                status = "[dim]⚪ INACTIVE[/]"
+                tech_id = "[dim]N/A[/]"
+                tech_name = "[dim]No active threat detected[/]"
+            table.add_row(tactic, status, tech_id, tech_name)
+
+        console.print(table)

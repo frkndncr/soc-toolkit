@@ -61,6 +61,12 @@ class WhitelistFilter:
         """
         try:
             ip_obj = ipaddress.ip_address(ip_str)
+            if ip_obj.is_private:
+                return True, "RFC1918 Private Enterprise Internal IP", "Internal Network"
+            if ip_obj.is_loopback:
+                return True, "Localhost Loopback IP Address", "Localhost"
+            if ip_obj.is_link_local:
+                return True, "Link-Local IP Address", "Local Network"
             for cidr, name, provider in BENIGN_SUBNETS:
                 if ip_obj in ipaddress.ip_network(cidr):
                     return True, name, provider
