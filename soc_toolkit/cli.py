@@ -138,6 +138,8 @@ def main():
             suggested = matches[0]
             console.print(f"[yellow]💡 Unknown subcommand '{cmd}'. Auto-correcting to '[bold]{suggested}[/]'...[/]\n")
             cmd = suggested
+
+    if cmd == "asm":
         target = args.subarg or "example.com"
         res = AttackSurfaceScanner.scan_domain(target)
         console.print(Panel(json.dumps(res, indent=2), title="🌐 External Attack Surface & Shadow IT Scan", border_style="cyan"))
