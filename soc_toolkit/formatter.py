@@ -54,19 +54,8 @@ class OutputFormatter:
                 pass
 
     def print_banner(self):
-        """Print tool banner"""
-        banner = """
-[bold cyan]
-███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
-██╔════╝██╔═══██╗██╔════╝    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██║ ██╔╝██║╚══██╔══╝
-███████╗██║   ██║██║            ██║   ██║   ██║██║   ██║██║     █████╔╝ ██║   ██║   
-╚════██║██║   ██║██║            ██║   ██║   ██║██║   ██║██║     ██╔═██╗ ██║   ██║   
-███████║╚██████╔╝╚██████╗       ██║   ╚██████╔╝╚██████╔╝███████╗██║  ██╗██║   ██║   
-╚══════╝ ╚═════╝  ╚═════╝       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝   
-[/]
-[dim]SOC Analyst Workbench v{version} | Enterprise Threat Intelligence & Incident Response[/]
-        """.format(version=Config.VERSION)
-        self._safe_print(banner)
+        """Print minimalist tool banner"""
+        self._safe_print(f"\n[bold cyan]🛡️ SOC Toolkit v{Config.VERSION}[/] [dim]| Global Enterprise Security Platform[/]\n")
         
     def print_report(self, report: IOCReport, show_playbook: bool = False, show_osint: bool = True):
         """Print formatted report to console"""

@@ -79,47 +79,41 @@ def create_parser() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         prog="soc",
-        description="🛡️ SOC Toolkit - Global Enterprise Security Operations Platform",
+        description=f"🛡️ SOC Toolkit v{__version__} - Enterprise Threat Intelligence & Security Platform",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  soc 185.220.101.45                    # IP lookup
-  soc asm enterprise.com                # Attack Surface Discovery & Shadow IT
-  soc ransomware 185.220.101.45         # Ransomware Gang TTP Matcher (LockBit, ALPHV)
-  soc convert "EventID 4625 failed..."   # Auto-convert log snippet to Sigma/YARA rules
-  soc i18n 185.220.101.45 de            # German Executive Security Report
+Commands:
+  soc <ioc>             Lookup IP, Domain, Hash, or URL
+  soc ai <ioc>          Autonomous AI Root Cause Analysis
+  soc asm <domain>      Attack Surface Discovery & Shadow IT
+  soc mem <file>        Process Memory & Mimikatz Threat Hunter
+  soc stream            Real-time Syslog Stream Listener
+  soc shell             Interactive Analyst Terminal Shell
 
-Author: Furkan Dinçer (@frkndncr)
-GitHub: https://github.com/frkndncr/soc-toolkit
+Author: Furkan Dinçer (@frkndncr) | https://github.com/frkndncr/soc-toolkit
         """
     )
     
-    parser.add_argument("ioc", nargs="?", help="IOC to lookup (IP, domain, hash, URL) or subcommand")
-    parser.add_argument("subarg", nargs="?", help="Secondary argument for subcommands")
-    parser.add_argument("extra_arg", nargs="?", help="Tertiary argument for subcommands")
+    parser.add_argument("ioc", nargs="?", help="Target IOC or subcommand")
+    parser.add_argument("subarg", nargs="?", help="Secondary argument")
+    parser.add_argument("extra_arg", nargs="?", help="Tertiary argument")
 
-    output_group = parser.add_argument_group("Output & Export Options")
-    output_group.add_argument("--json", metavar="FILE", help="Export report to JSON file")
-    output_group.add_argument("--md", "--markdown", metavar="FILE", dest="markdown", help="Export report to Markdown file")
-    output_group.add_argument("--csv", metavar="FILE", help="Export report to CSV file")
+    output_group = parser.add_argument_group("Export Options")
+    output_group.add_argument("--json", metavar="FILE", help="Export to JSON file")
+    output_group.add_argument("--md", "--markdown", metavar="FILE", dest="markdown", help="Export to Markdown file")
+    output_group.add_argument("--csv", metavar="FILE", help="Export to CSV file")
     output_group.add_argument("--html", metavar="FILE", help="Export interactive HTML report")
-    output_group.add_argument("--stix", metavar="FILE", help="Export STIX 2.1 JSON Bundle")
-    output_group.add_argument("--mitre-layer", metavar="FILE", help="Export MITRE ATT&CK Navigator Layer JSON")
-    output_group.add_argument("--graph", metavar="FILE", help="Export Interactive Threat Graph HTML")
     
-    soc_group = parser.add_argument_group("Enterprise & Threat Hunting Features")
-    soc_group.add_argument("--playbook", action="store_true", help="Generate Incident Response Playbook")
+    soc_group = parser.add_argument_group("Security Options")
+    soc_group.add_argument("--playbook", action="store_true", help="Generate IR Playbook")
     soc_group.add_argument("--sigma", action="store_true", help="Generate Sigma SIEM Rule")
     soc_group.add_argument("--yara", action="store_true", help="Generate YARA Rule")
-    soc_group.add_argument("--siem-queries", action="store_true", help="Generate Splunk/Elastic/Sentinel queries")
-    soc_group.add_argument("--osint", action="store_true", help="Display OSINT investigation links")
-    soc_group.add_argument("--port", type=int, default=8000, help="Port for server/web")
+    soc_group.add_argument("--port", type=int, default=8000, help="Server port")
 
     display_group = parser.add_argument_group("Display Options")
     display_group.add_argument("-q", "--quiet", action="store_true", help="Suppress banner")
-    display_group.add_argument("--raw", action="store_true", help="Output raw JSON")
-    display_group.add_argument("--brief", action="store_true", help="Show brief summary only")
-    display_group.add_argument("--providers", action="store_true", help="List available providers")
+    display_group.add_argument("--raw", action="store_true", help="Raw JSON output")
+    display_group.add_argument("--providers", action="store_true", help="List providers")
     display_group.add_argument("--version", action="version", version=f"SOC Toolkit v{__version__}")
     
     return parser
