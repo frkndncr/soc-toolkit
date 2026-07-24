@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SOC Toolkit v7.0
+# 🛡️ SOC Toolkit v7.0.1
 
 ```text
 ███████╗ ██████╗  ██████╗    ████████╗ ██████╗  ██████╗ ██╗     ██╗  ██╗██╗████████╗
@@ -32,14 +32,20 @@ pip install soc-toolkit
 # 2. Perform instant Zero-Key Threat Intel Lookup with AI Triage
 soc 185.220.101.45
 
-# 3. Launch Interactive Analyst Terminal Shell
+# 3. Launch Next-Gen Interactive Analyst Command Center Shell
 soc shell
 
-# 4. Start Enterprise REST API Server
-soc server --port 8000
+# 4. Perform Multithreaded Batch Log File Triage
+soc batch logs.txt
 
-# 5. Launch 3D Cyber Threat Warfare Dashboard
-soc web --port 8080
+# 5. Check Whitelist & False Positive Status
+soc whitelist 10.0.0.1
+
+# 6. Render 14-Tactic MITRE ATT&CK Visual Matrix
+soc mitre 185.220.101.45
+
+# 7. Start Enterprise REST API Server
+soc server --port 8000
 ```
 
 ---
@@ -48,6 +54,10 @@ soc web --port 8080
 
 | Feature | Description | Command |
 | :--- | :--- | :--- |
+| **💻 Interactive Analyst Shell** | Next-Gen prompt with SIEM log triage (`scan`), notes (`note`), dual comparison (`compare`), SOAR blocks (`block`) & CTI Q&A (`ask`) | `soc shell` |
+| **📁 Multithreaded Batch Scanner** | Parses log files, emails, or raw dumps, extracts IOCs & runs parallel threat triage | `soc batch <file>` |
+| **🟢 Whitelist & False Positive Filter** | RFC1918 private IPs (`10.0.0.0/8`), loopbacks, and trusted DNS infrastructure filter | `soc whitelist <ioc>` |
+| **🗺️ MITRE ATT&CK Visual Matrix** | Renders color-coded 14-tactic ATT&CK heatmap grid across active threat TTPs | `soc mitre <ioc>` |
 | **🦠 Zero-Key VirusTotal / Shodan / AbuseIPDB** | API Key-Free public VirusTotal, Shodan (CVEs & Risk Grade A-F), AbuseIPDB & Cisco Talos | `soc <ioc>` |
 | **🤖 Autonomous AI Analyst** | Root Cause Analysis (RCA) & Cyber Kill Chain Attribution | `soc ai <ioc>` |
 | **📡 Live Syslog Stream** | Real-time UDP 514 Syslog listener with Slack/Teams Webhook alerts | `soc stream` |
@@ -60,7 +70,22 @@ soc web --port 8080
 | **🗣️ Multi-Language Reports** | Generates reports in English, Turkish, German, French, Spanish & Japanese | `soc i18n <ioc> de` |
 | **🔄 Automated SOAR Engine** | Executes containment, host isolation & firewall bans | `soc soar <ioc>` |
 | **📜 Regulatory Compliance** | Maps findings to **PCI-DSS 4.0**, **ISO 27001**, **SOC 2** & **NIST CSF** | `soc audit <ioc>` |
-| **🕸️ 3D Threat Dashboard** | High-tech WebGL cyber warfare threat map | `soc web --port 8080` |
+
+---
+
+## 💻 Next-Gen Interactive Analyst Shell Commands (`soc shell`)
+
+Inside `soc shell`, analysts can run real-time triage without leaving the command prompt:
+
+```text
+soc-shell> scan "Failed login attempt from 185.220.101.45 on port 22"
+soc-shell> note 185.220.101.45 "Confirmed Cobalt Strike C2 IP"
+soc-shell> compare 185.220.101.45 8.8.8.8
+soc-shell> block 185.220.101.45
+soc-shell> mitre 185.220.101.45
+soc-shell> ask Is 185.220.101.45 associated with LockBit ransomware?
+soc-shell> export-session shift_report.html
+```
 
 ---
 
