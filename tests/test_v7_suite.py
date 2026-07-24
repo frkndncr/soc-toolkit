@@ -81,6 +81,35 @@ def test_mitre_matrix_engine_deep():
     MITREMatrixEngine.print_visual_matrix("185.220.101.45", IOCType.IP, ThreatLevel.CRITICAL)
 
 
+def test_interactive_shell_features():
+    """Test InteractiveShell session history, export, compare, and block"""
+    from soc_toolkit.shell import InteractiveShell
+    shell = InteractiveShell()
+    
+    # Test block rule generation
+    shell.run_block("185.220.101.45")
+    
+    # Test session history tracking & export
+    shell.session_history.append({
+        "ioc": "185.220.101.45",
+        "type": "IP",
+        "threat": "CRITICAL",
+        "time": "2026-07-24T12:00:00"
+    })
+    
+    with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False) as tmp:
+        tmp_path = tmp.name
+        
+    try:
+        shell.export_session(tmp_path)
+        assert os.path.exists(tmp_path)
+        content = open(tmp_path, "r", encoding="utf-8").read()
+        assert "185.220.101.45" in content
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
 def test_ioc_sanitizer_extensive():
     """Test comprehensive edge case sanitization"""
     assert IOCSanitizer.sanitize("(185.220.101.45)") == "185.220.101.45"

@@ -10,7 +10,7 @@ class Config:
     """Configuration settings"""
     
     VERSION = "7.0.1"
-    TIMEOUT = 15
+    TIMEOUT = 4
     USER_AGENT = "SOC-Toolkit/7.0.1 (https://github.com/frkndncr/soc-toolkit)"
     MAX_WORKERS = 10
     

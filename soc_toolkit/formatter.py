@@ -57,7 +57,7 @@ class OutputFormatter:
         """Print minimalist tool banner"""
         self._safe_print(f"\n[bold cyan]🛡️ SOC Toolkit v{Config.VERSION}[/] [dim]| Global Enterprise Security Platform[/]\n")
         
-    def print_report(self, report: IOCReport, show_playbook: bool = False, show_osint: bool = True):
+    def print_report(self, report: IOCReport, show_playbook: bool = False, show_osint: bool = True, clean_mode: bool = False):
         """Print formatted report to console"""
         
         header_text = Text()
@@ -67,15 +67,21 @@ class OutputFormatter:
         header_text.append(f"{report.ioc_type.value.upper()}\n", style="magenta")
         header_text.append("🕐 Time: ", style="bold")
         header_text.append(f"{report.timestamp}\n", style="dim")
-        header_text.append(f"\n{report.summary}", 
-                         style=THREAT_COLORS.get(report.overall_threat_level, "white"))
         
-        self._safe_print(Panel(
-            header_text, 
-            title="[bold white]📊 IOC Analysis Report[/]", 
-            border_style="cyan", 
-            box=box.DOUBLE
-        ))
+        icon = THREAT_ICONS.get(report.overall_threat_level, "⚪")
+        color = THREAT_COLORS.get(report.overall_threat_level, "white")
+        header_text.append(f"\n{icon} ", style="bold")
+        header_text.append(f"{report.overall_threat_level.value} - ", style=f"{color}")
+        
+        found_sources = [r for r in report.results if r.found]
+        if report.overall_threat_level == ThreatLevel.CLEAN:
+            header_text.append("No threats detected\n", style="green")
+        else:
+            header_text.append(f"Threat detected across {len(found_sources)} sources\n", style="bold red")
+            
+        header_text.append(f"📊 Found in {len(found_sources)}/{len(report.results)} sources", style="dim")
+
+        self._safe_print(Panel(header_text, title="📊 IOC Analysis Report", border_style=color.split()[0]))
         
         table = Table(
             title="🔎 Source Results", 
@@ -90,6 +96,9 @@ class OutputFormatter:
         table.add_column("Time", width=8, justify="right")
         
         for result in report.results:
+            if clean_mode and result.error and "API key required" in result.error:
+                continue
+
             if result.error:
                 status = "[red]❌ Error[/]"
             elif result.found:

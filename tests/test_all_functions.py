@@ -282,11 +282,12 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         test_ioc_sanitizer_dirty_ip()
 
     def test_27_enterprise_suite(self):
-        from test_v7_suite import test_whitelist_comprehensive, test_batch_scanner_real_file, test_mitre_matrix_engine_deep, test_ioc_sanitizer_extensive
+        from test_v7_suite import test_whitelist_comprehensive, test_batch_scanner_real_file, test_mitre_matrix_engine_deep, test_ioc_sanitizer_extensive, test_interactive_shell_features
         test_whitelist_comprehensive()
         test_batch_scanner_real_file()
         test_mitre_matrix_engine_deep()
         test_ioc_sanitizer_extensive()
+        test_interactive_shell_features()
 
 
 if __name__ == "__main__":
