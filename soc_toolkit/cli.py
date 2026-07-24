@@ -331,40 +331,45 @@ def main():
         if args.raw:
             print(json.dumps(report.__dict__, default=str, indent=2))
             return
-        formatter.print_report(report, show_playbook=args.playbook, show_osint=args.osint)
+        
+        show_playbook = getattr(args, 'playbook', False)
+        show_osint = getattr(args, 'osint', True)
+        formatter.print_report(report, show_playbook=show_playbook, show_osint=show_osint)
 
-        if args.siem_queries:
+        if getattr(args, 'siem_queries', False):
             queries = SIEMQueryGenerator.generate_all(report.ioc, report.ioc_type)
             console.print("\n[bold cyan]Multi-SIEM Search Queries:[/]")
             for platform, q in queries.items():
                 console.print(f"  • [bold]{platform.upper()}:[/] [dim]{q}[/]")
 
-        if args.sigma:
+        if getattr(args, 'sigma', False):
             console.print("\n[bold cyan]Sigma SIEM Rule:[/]")
             console.print(DetectionRuleGenerator.generate_sigma(report.ioc, report.ioc_type))
 
-        if args.yara:
+        if getattr(args, 'yara', False):
             console.print("\n[bold cyan]YARA Rule:[/]")
             console.print(DetectionRuleGenerator.generate_yara(report.ioc, report.ioc_type))
 
-        if args.mitre_layer:
-            MITRENavigatorExporter.export_to_file(report.ioc, report.overall_threat_level, args.mitre_layer)
-            console.print(f"[green]MITRE ATT&CK Navigator Layer saved: {args.mitre_layer}[/]")
+        mitre_layer = getattr(args, 'mitre_layer', None)
+        if mitre_layer:
+            MITRENavigatorExporter.export_to_file(report.ioc, report.overall_threat_level, mitre_layer)
+            console.print(f"[green]MITRE ATT&CK Navigator Layer saved: {mitre_layer}[/]")
 
-        if args.graph:
+        graph = getattr(args, 'graph', None)
+        if graph:
             findings = [{"source": r.source} for r in report.results if r.found]
-            ThreatGraphVisualizer.export_graph(report.ioc, report.overall_threat_level.value, findings, args.graph)
-            console.print(f"[green]Interactive Threat Graph saved: {args.graph}[/]")
+            ThreatGraphVisualizer.export_graph(report.ioc, report.overall_threat_level.value, findings, graph)
+            console.print(f"[green]Interactive Threat Graph saved: {graph}[/]")
 
-        if args.html:
+        if getattr(args, 'html', None):
             formatter.export_html(report, args.html)
-        if args.stix:
+        if getattr(args, 'stix', None):
             formatter.export_stix(report, args.stix)
-        if args.json:
+        if getattr(args, 'json', None):
             formatter.export_json(report, args.json)
-        if args.markdown:
+        if getattr(args, 'markdown', None):
             formatter.export_markdown(report, args.markdown)
-        if args.csv:
+        if getattr(args, 'csv', None):
             formatter.export_csv(report, args.csv)
         return
 
