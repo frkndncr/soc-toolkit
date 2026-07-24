@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soc-toolkit"
-version = "6.0.0"
-description = "🛡️ SOC Toolkit Enterprise SOC Suite - Live Syslog Stream | Memory Forensics | Executive Report Gen | MITRE Heatmap"
+version = "7.0.0"
+description = "🛡️ SOC Toolkit v7.0 Global Enterprise Security Suite - Zero-Key VirusTotal/Shodan/AbuseIPDB Engine | EDR Telemetry | Syslog Stream"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
