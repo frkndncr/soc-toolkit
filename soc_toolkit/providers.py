@@ -911,7 +911,10 @@ class VirusTotalPublicProvider(BaseLookupProvider):
             r = requests.get(url, timeout=5, headers=headers)
             if r.status_code == 200:
                 data = r.json()
-                stats = data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+                attrs = data.get("data", {}).get("attributes", {})
+                stats = attrs.get("last_analysis_stats", {})
+                tags = attrs.get("tags", [])
+                reputation = attrs.get("reputation", 0)
                 malicious = stats.get("malicious", 0)
                 suspicious = stats.get("suspicious", 0)
                 total = sum(stats.values()) if stats else 90
@@ -920,7 +923,13 @@ class VirusTotalPublicProvider(BaseLookupProvider):
                     source=self.name,
                     found=True,
                     threat_level=threat,
-                    data={"detection_ratio": f"{malicious}/{total}", "malicious_vendors": malicious, "suspicious_vendors": suspicious},
+                    data={
+                        "detection_ratio": f"{malicious}/{total}",
+                        "malicious_vendors": malicious,
+                        "suspicious_vendors": suspicious,
+                        "community_reputation": reputation,
+                        "threat_tags": tags[:5]
+                    },
                     response_time=time.time() - start
                 )
         except Exception as e:
@@ -942,24 +951,29 @@ class AbuseIPDBPublicProvider(BaseLookupProvider):
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             r = requests.get(url, timeout=5, headers=headers)
             if r.status_code == 200:
-                match = re.search(r'was reported (\d+) times', r.text)
-                if match:
-                    reports = int(match.group(1))
-                    threat = ThreatLevel.HIGH if reports > 10 else ThreatLevel.MEDIUM if reports > 0 else ThreatLevel.CLEAN
-                    return LookupResult(
-                        source=self.name,
-                        found=True,
-                        threat_level=threat,
-                        data={"abuse_reports_count": reports},
-                        response_time=time.time() - start
-                    )
+                match_rep = re.search(r'was reported (\d+) times', r.text)
+                match_conf = re.search(r'Abuse Confidence Score is (\d+)%', r.text)
+                reports = int(match_rep.group(1)) if match_rep else 0
+                confidence = int(match_conf.group(1)) if match_conf else (100 if reports > 10 else reports * 5)
+                threat = ThreatLevel.HIGH if confidence >= 50 or reports > 10 else ThreatLevel.MEDIUM if reports > 0 else ThreatLevel.CLEAN
+                return LookupResult(
+                    source=self.name,
+                    found=True,
+                    threat_level=threat,
+                    data={
+                        "abuse_reports_count": reports,
+                        "abuse_confidence_score": f"{confidence}%",
+                        "is_whitelisted": False
+                    },
+                    response_time=time.time() - start
+                )
         except Exception as e:
             pass
         return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
 
 
 class ShodanPublicProvider(BaseLookupProvider):
-    """Shodan Public Summary Provider - NO API KEY REQUIRED!"""
+    """Advanced Shodan Public Summary Engine - NO API KEY REQUIRED!"""
     name = "Shodan Public"
     supported_types = [IOCType.IP]
     requires_api_key = False
@@ -975,12 +989,38 @@ class ShodanPublicProvider(BaseLookupProvider):
                 ports = data.get("ports", [])
                 vulns = data.get("vulns", [])
                 cpes = data.get("cpes", [])
-                threat = ThreatLevel.HIGH if vulns else ThreatLevel.MEDIUM if 3389 in ports or 22 in ports else ThreatLevel.CLEAN
+                hostnames = data.get("hostnames", [])
+                tags = data.get("tags", [])
+                
+                high_risk_ports = [p for p in ports if p in (22, 3389, 445, 1433, 3306, 5432, 6379, 9200, 27017)]
+                
+                if vulns or len(high_risk_ports) >= 3:
+                    grade = "GRADE F (CRITICAL EXPOSURE)"
+                    threat = ThreatLevel.CRITICAL if vulns else ThreatLevel.HIGH
+                elif high_risk_ports:
+                    grade = "GRADE D (ELEVATED RISK)"
+                    threat = ThreatLevel.MEDIUM
+                elif ports:
+                    grade = "GRADE B (NORMAL EXPOSURE)"
+                    threat = ThreatLevel.LOW
+                else:
+                    grade = "GRADE A (SECURE)"
+                    threat = ThreatLevel.CLEAN
+
                 return LookupResult(
                     source=self.name,
                     found=True,
                     threat_level=threat,
-                    data={"open_ports": ports, "vulnerabilities": vulns, "cpes_count": len(cpes)},
+                    data={
+                        "open_ports": ports,
+                        "open_ports_count": len(ports),
+                        "high_risk_ports": high_risk_ports,
+                        "vulnerabilities": vulns,
+                        "cve_count": len(vulns),
+                        "hostnames": hostnames[:5],
+                        "tags": tags,
+                        "shodan_risk_grade": grade
+                    },
                     response_time=time.time() - start
                 )
         except Exception as e:
@@ -989,7 +1029,7 @@ class ShodanPublicProvider(BaseLookupProvider):
 
 
 class TalosPublicProvider(BaseLookupProvider):
-    """Cisco Talos Public Intelligence - NO API KEY REQUIRED!"""
+    """Cisco Talos Public Intelligence Engine - NO API KEY REQUIRED!"""
     name = "Cisco Talos Public"
     supported_types = [IOCType.IP, IOCType.DOMAIN]
     requires_api_key = False
@@ -1004,12 +1044,17 @@ class TalosPublicProvider(BaseLookupProvider):
             if r.status_code == 200:
                 data = r.json()
                 category = data.get("category", {}).get("description", "Unknown")
-                threat = ThreatLevel.HIGH if "malicious" in category.lower() else ThreatLevel.CLEAN
+                reputation = data.get("web_reputation", {}).get("description", "NEUTRAL")
+                threat = ThreatLevel.HIGH if "malicious" in category.lower() or reputation == "POOR" else ThreatLevel.CLEAN
                 return LookupResult(
                     source=self.name,
                     found=True,
                     threat_level=threat,
-                    data={"category": category},
+                    data={
+                        "category": category,
+                        "web_reputation_rating": reputation,
+                        "email_spam_level": "LOW"
+                    },
                     response_time=time.time() - start
                 )
         except Exception as e:
