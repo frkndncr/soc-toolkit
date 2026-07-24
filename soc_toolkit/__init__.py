@@ -1,8 +1,8 @@
 """
-SOC Toolkit Global Enterprise Multi-Tenant Security Suite v7.0.0
+SOC Toolkit Global Enterprise Multi-Tenant Security Suite v7.0.1
 """
 
-__version__ = "7.0.0"
+__version__ = "7.0.1"
 __author__ = "Furkan Dinçer"
 __email__ = "frkndncr@github.com"
 __url__ = "https://github.com/frkndncr/soc-toolkit"
