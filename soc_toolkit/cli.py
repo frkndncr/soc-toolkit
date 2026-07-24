@@ -128,16 +128,22 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    raw_cmd = args.ioc
-    cmd = IOCSanitizer.sanitize(raw_cmd) if raw_cmd else ""
+    raw_cmd = (args.ioc or "").strip()
 
-    # Check fuzzy subcommand match (e.g. soc aii -> soc ai)
-    if cmd and cmd not in SUBCOMMANDS:
-        matches = difflib.get_close_matches(cmd, list(SUBCOMMANDS), n=1, cutoff=0.75)
-        if matches:
-            suggested = matches[0]
-            console.print(f"[yellow]💡 Unknown subcommand '{cmd}'. Auto-correcting to '[bold]{suggested}[/]'...[/]\n")
-            cmd = suggested
+    if raw_cmd in SUBCOMMANDS:
+        cmd = raw_cmd
+    else:
+        sanitized = IOCSanitizer.sanitize(raw_cmd)
+        if sanitized in SUBCOMMANDS:
+            cmd = sanitized
+        else:
+            matches = difflib.get_close_matches(raw_cmd, list(SUBCOMMANDS), n=1, cutoff=0.8)
+            if matches:
+                suggested = matches[0]
+                console.print(f"[yellow]💡 Unknown subcommand '{raw_cmd}'. Auto-correcting to '[bold]{suggested}[/]'...[/]\n")
+                cmd = suggested
+            else:
+                cmd = sanitized
 
     if cmd == "asm":
         target = args.subarg or "example.com"
