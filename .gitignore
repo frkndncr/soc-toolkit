@@ -145,5 +145,9 @@ Thumbs.db
 *.csv
 *.md
 !README.md
+!CODE_OF_CONDUCT.md
+!CONTRIBUTING.md
+!SECURITY.md
+!.github/**/*.md
 reports/
 output/
