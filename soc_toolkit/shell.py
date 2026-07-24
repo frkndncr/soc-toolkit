@@ -23,6 +23,8 @@ from .ai_analyst import AIThreatAnalyst
 from .enums import ThreatLevel, IOCType
 from .soar import SOAREngine
 from .edr_collector import EDRCollectorEngine
+from .triage import LogTriageEngine
+from .mitre_matrix import MITREMatrixEngine
 
 
 class InteractiveShell:
@@ -49,6 +51,9 @@ class InteractiveShell:
         table.add_column("Command", style="bold yellow", width=25)
         table.add_column("Description", style="white")
         table.add_row("<ioc>", "Instant threat lookup on IP, Domain, Hash, or URL")
+        table.add_row("scan / triage <log>", "SIEM Log & Raw Text Triage + IOC Extractor")
+        table.add_row("note <ioc> \"<text>\"", "Attach analyst note to IOC in shift report")
+        table.add_row("mitre <ioc>", "Render 14-tactic MITRE ATT&CK heatmap grid")
         table.add_row("compare <ioc1> <ioc2>", "Side-by-side threat comparison between 2 targets")
         table.add_row("block <ioc>", "Generate instant firewall ban rules (Palo Alto, Fortinet, IPTables)")
         table.add_row("isolate <host>", "Execute EDR host isolation workflow")
@@ -186,6 +191,31 @@ class InteractiveShell:
                     question = " ".join(args)
                     res = AIThreatAnalyst.analyze_threat(question, IOCType.IP, ThreatLevel.HIGH)
                     self.console.print(Panel(json.dumps(res, indent=2), title="🤖 AI Threat CTI Assistant Answer", border_style="cyan"))
+                    continue
+
+                if cmd in ("note", "annotate") and len(args) >= 2:
+                    target_ioc = args[0]
+                    note_text = " ".join(args[1:])
+                    for item in self.session_history:
+                        if item["ioc"] == target_ioc:
+                            item["note"] = note_text
+                    self._safe_print(f"[bold green]📝 Note attached to {target_ioc}:[/] [dim]{note_text}[/]")
+                    continue
+
+                if cmd in ("scan", "triage") and len(args) >= 1:
+                    raw_target = " ".join(args)
+                    triage_engine = LogTriageEngine(self.soc)
+                    if Path(raw_target).exists():
+                        res = triage_engine.triage_file(raw_target)
+                    else:
+                        res = triage_engine.triage_text(raw_target)
+                    self._safe_print(Panel(json.dumps(res, indent=2), title="🔍 SIEM Log Triage & Threat Extraction Result", border_style="cyan"))
+                    continue
+
+                if cmd in ("mitre", "matrix") and len(args) >= 1:
+                    target = args[0]
+                    report = self.soc.lookup(target)
+                    MITREMatrixEngine.print_visual_matrix(report.ioc, report.ioc_type, report.overall_threat_level)
                     continue
 
                 if cmd == "export-session":

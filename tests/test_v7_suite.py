@@ -103,11 +103,21 @@ def test_interactive_shell_features():
     try:
         shell.export_session(tmp_path)
         assert os.path.exists(tmp_path)
-        content = open(tmp_path, "r", encoding="utf-8").read()
+        with open(tmp_path, "r", encoding="utf-8") as f:
+            content = f.read()
         assert "185.220.101.45" in content
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+def test_log_triage_text_snippet():
+    """Test raw log text snippet triage and IOC extraction"""
+    from soc_toolkit.triage import LogTriageEngine
+    engine = LogTriageEngine()
+    sample_text = "Failed login attempt from IP 185.220.101.45 on port 22. Connecting to C2 domain malicious-c2.com"
+    res = engine.triage_text(sample_text)
+    assert res["total_iocs_extracted"] >= 2
+    assert "185.220.101.45" in res["critical_iocs"] or len(res["all_extracted_iocs"]) >= 2
 
 
 def test_ioc_sanitizer_extensive():

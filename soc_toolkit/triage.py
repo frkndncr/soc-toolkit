@@ -76,3 +76,45 @@ class LogTriageEngine:
             ],
             "reports": reports
         }
+
+    def triage_text(self, text: str, name: str = "Raw Log Snippet", max_iocs: int = 50) -> Dict[str, Any]:
+        """Triage raw log text snippet or email body"""
+        extraction_dict = IOCExtractor.extract_from_text(text, include_private_ips=True)
+        ips = list(extraction_dict.get("ip", set()))
+        domains = list(extraction_dict.get("domain", set()))
+        hashes = list(extraction_dict.get("md5", set()) | extraction_dict.get("sha1", set()) | extraction_dict.get("sha256", set()))
+        urls = list(extraction_dict.get("url", set()))
+        all_iocs = list(set(ips + domains + hashes + urls))
+
+        if not all_iocs:
+            return {
+                "source": name,
+                "timestamp": datetime.now().isoformat(),
+                "total_iocs_found": 0,
+                "summary": "No IOCs found in log snippet.",
+                "top_critical_threats": []
+            }
+
+        target_iocs = all_iocs[:max_iocs]
+        reports = []
+        critical_reports = []
+
+        for ioc_str in target_iocs:
+            report = self.soc.lookup(ioc_str)
+            reports.append({
+                "ioc": report.ioc,
+                "type": report.ioc_type.value,
+                "threat_level": report.overall_threat_level.value
+            })
+            if report.overall_threat_level in (ThreatLevel.HIGH, ThreatLevel.CRITICAL):
+                critical_reports.append(report.ioc)
+
+        return {
+            "source": name,
+            "timestamp": datetime.now().isoformat(),
+            "total_iocs_extracted": len(all_iocs),
+            "iocs_analyzed": len(reports),
+            "critical_threats_count": len(critical_reports),
+            "critical_iocs": critical_reports,
+            "all_extracted_iocs": reports
+        }
