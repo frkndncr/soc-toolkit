@@ -145,7 +145,7 @@ class InteractiveShell:
                     self.console.clear()
                     continue
 
-                if cmd == "help":
+                if cmd in ("help", "?"):
                     self.print_help()
                     continue
 
