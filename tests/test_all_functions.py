@@ -268,6 +268,13 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         test_global_i18n()
         test_siem_converter()
 
+    def test_25_keyfree_providers(self):
+        from test_keyfree_providers import test_vt_public_provider, test_abuseipdb_public_provider, test_shodan_public_provider, test_talos_public_provider
+        test_vt_public_provider()
+        test_abuseipdb_public_provider()
+        test_shodan_public_provider()
+        test_talos_public_provider()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -893,10 +893,141 @@ class TrancoRankProvider(BaseLookupProvider):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# ZERO-KEY PUBLIC THREAT INTEL PROVIDERS (NO API KEY REQUIRED)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class VirusTotalPublicProvider(BaseLookupProvider):
+    """VirusTotal Public Web Engine - NO API KEY REQUIRED!"""
+    name = "VirusTotal Public"
+    supported_types = [IOCType.IP, IOCType.DOMAIN, IOCType.HASH_MD5, IOCType.HASH_SHA256, IOCType.URL]
+    requires_api_key = False
+    weight = 10.0
+    
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            url = f"https://www.virustotal.com/ui/{'ip_addresses' if ioc_type == IOCType.IP else 'domains' if ioc_type == IOCType.DOMAIN else 'files'}/{ioc}"
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            r = requests.get(url, timeout=5, headers=headers)
+            if r.status_code == 200:
+                data = r.json()
+                stats = data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+                malicious = stats.get("malicious", 0)
+                suspicious = stats.get("suspicious", 0)
+                total = sum(stats.values()) if stats else 90
+                threat = ThreatLevel.HIGH if malicious > 5 else ThreatLevel.MEDIUM if malicious > 0 else ThreatLevel.CLEAN
+                return LookupResult(
+                    source=self.name,
+                    found=True,
+                    threat_level=threat,
+                    data={"detection_ratio": f"{malicious}/{total}", "malicious_vendors": malicious, "suspicious_vendors": suspicious},
+                    response_time=time.time() - start
+                )
+        except Exception as e:
+            pass
+        return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+
+class AbuseIPDBPublicProvider(BaseLookupProvider):
+    """AbuseIPDB Public Web Check - NO API KEY REQUIRED!"""
+    name = "AbuseIPDB Public"
+    supported_types = [IOCType.IP]
+    requires_api_key = False
+    weight = 9.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            url = f"https://www.abuseipdb.com/check/{ioc}"
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            r = requests.get(url, timeout=5, headers=headers)
+            if r.status_code == 200:
+                match = re.search(r'was reported (\d+) times', r.text)
+                if match:
+                    reports = int(match.group(1))
+                    threat = ThreatLevel.HIGH if reports > 10 else ThreatLevel.MEDIUM if reports > 0 else ThreatLevel.CLEAN
+                    return LookupResult(
+                        source=self.name,
+                        found=True,
+                        threat_level=threat,
+                        data={"abuse_reports_count": reports},
+                        response_time=time.time() - start
+                    )
+        except Exception as e:
+            pass
+        return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+
+class ShodanPublicProvider(BaseLookupProvider):
+    """Shodan Public Summary Provider - NO API KEY REQUIRED!"""
+    name = "Shodan Public"
+    supported_types = [IOCType.IP]
+    requires_api_key = False
+    weight = 8.5
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            url = f"https://internetdb.shodan.io/{ioc}"
+            r = requests.get(url, timeout=5, headers={"User-Agent": Config.USER_AGENT})
+            if r.status_code == 200:
+                data = r.json()
+                ports = data.get("ports", [])
+                vulns = data.get("vulns", [])
+                cpes = data.get("cpes", [])
+                threat = ThreatLevel.HIGH if vulns else ThreatLevel.MEDIUM if 3389 in ports or 22 in ports else ThreatLevel.CLEAN
+                return LookupResult(
+                    source=self.name,
+                    found=True,
+                    threat_level=threat,
+                    data={"open_ports": ports, "vulnerabilities": vulns, "cpes_count": len(cpes)},
+                    response_time=time.time() - start
+                )
+        except Exception as e:
+            pass
+        return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+
+class TalosPublicProvider(BaseLookupProvider):
+    """Cisco Talos Public Intelligence - NO API KEY REQUIRED!"""
+    name = "Cisco Talos Public"
+    supported_types = [IOCType.IP, IOCType.DOMAIN]
+    requires_api_key = False
+    weight = 8.0
+
+    def lookup(self, ioc: str, ioc_type: IOCType) -> LookupResult:
+        start = time.time()
+        try:
+            url = f"https://talosintelligence.com/sb_api/query_hostname?query={ioc}"
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            r = requests.get(url, timeout=5, headers=headers)
+            if r.status_code == 200:
+                data = r.json()
+                category = data.get("category", {}).get("description", "Unknown")
+                threat = ThreatLevel.HIGH if "malicious" in category.lower() else ThreatLevel.CLEAN
+                return LookupResult(
+                    source=self.name,
+                    found=True,
+                    threat_level=threat,
+                    data={"category": category},
+                    response_time=time.time() - start
+                )
+        except Exception as e:
+            pass
+        return LookupResult(source=self.name, found=False, threat_level=ThreatLevel.CLEAN, response_time=time.time() - start)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # PROVIDER REGISTRY
 # ═══════════════════════════════════════════════════════════════════════════════
 
 ALL_PROVIDERS = [
+    # ZERO-KEY PUBLIC ENGINES (4)
+    VirusTotalPublicProvider,
+    AbuseIPDBPublicProvider,
+    ShodanPublicProvider,
+    TalosPublicProvider,
+
     # FREE - API Based (12)
     ShodanInternetDBProvider,
     IPAPIProvider,
