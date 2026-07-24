@@ -119,14 +119,25 @@ Author: Furkan Dinçer (@frkndncr) | https://github.com/frkndncr/soc-toolkit
     return parser
 
 
+import difflib
+from .sanitizer import IOCSanitizer
+
+
 def main():
     """Main CLI entrypoint"""
     parser = create_parser()
     args = parser.parse_args()
 
-    cmd = args.ioc
+    raw_cmd = args.ioc
+    cmd = IOCSanitizer.sanitize(raw_cmd) if raw_cmd else ""
 
-    if cmd == "asm":
+    # Check fuzzy subcommand match (e.g. soc aii -> soc ai)
+    if cmd and cmd not in SUBCOMMANDS:
+        matches = difflib.get_close_matches(cmd, list(SUBCOMMANDS), n=1, cutoff=0.75)
+        if matches:
+            suggested = matches[0]
+            console.print(f"[yellow]💡 Unknown subcommand '{cmd}'. Auto-correcting to '[bold]{suggested}[/]'...[/]\n")
+            cmd = suggested
         target = args.subarg or "example.com"
         res = AttackSurfaceScanner.scan_domain(target)
         console.print(Panel(json.dumps(res, indent=2), title="🌐 External Attack Surface & Shadow IT Scan", border_style="cyan"))

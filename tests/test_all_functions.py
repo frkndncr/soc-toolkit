@@ -275,6 +275,12 @@ class ComprehensiveAllFunctionsTest(unittest.TestCase):
         test_shodan_public_provider()
         test_talos_public_provider()
 
+    def test_26_precision_sanitizer(self):
+        from test_precision import test_ioc_sanitizer_brackets, test_ioc_sanitizer_defanged, test_ioc_sanitizer_dirty_ip
+        test_ioc_sanitizer_brackets()
+        test_ioc_sanitizer_defanged()
+        test_ioc_sanitizer_dirty_ip()
+
 
 if __name__ == "__main__":
     unittest.main()
